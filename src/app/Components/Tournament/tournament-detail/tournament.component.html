@@ -1,0 +1,28 @@
+<div class="container">
+
+  <div *ngIf="tournament">
+    <h4>
+      <b>Title: {{ tournament.title }}</b>
+    </h4>
+
+    <p>Created by: {{ tournament.ownerId }}</p>
+    <p>Pairing Type: {{ tournament.pairing }}</p>
+    <p>Tiebreak Type: {{ tournament.tiebreaker }}</p>
+    <mat-list>
+      <mat-list-item><button mat-button color="primary" (click)="goParticipantsList(tournament.tournamentId)">Llista de
+          Participants</button></mat-list-item>
+      <mat-list-item><button mat-button color="primary"
+          (click)="goClassification(tournament.tournamentId)">Classificació del Torneig</button></mat-list-item>
+      <mat-list-item><button mat-button color="primary" (click)="goOldResults(tournament.tournamentId)">Resultats Rondes
+          Anteriors</button></mat-list-item>
+      <mat-list-item><button mat-button color="primary" (click)="goNextPairing(tournament.tournamentId)">Aparellaments
+          Propera Ronda</button></mat-list-item>
+      <mat-list-item><button *ngIf="permission" mat-button color="primary"
+          (click)="goAddParticipant(tournament.tournamentId)">Afegir Participants</button></mat-list-item>
+      <mat-list-item><button *ngIf="permission" mat-button color="primary"
+          (click)="goNewPairing(tournament.tournamentId)">Generar Aparellaments</button></mat-list-item>
+      <mat-list-item><button *ngIf="permission" mat-button color="primary"
+          (click)="goEnterResults(tournament.tournamentId)">Introduir Resultats</button></mat-list-item>
+    </mat-list>
+  </div>
+</div>

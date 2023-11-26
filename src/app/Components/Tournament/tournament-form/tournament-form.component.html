@@ -1,0 +1,37 @@
+<h1>Formulari de Creació de Torneig</h1>
+<form [formGroup]="tournamentForm" (ngSubmit)="sendForm()">
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Títol del Torneig: </mat-label>
+      <input matInput type="text" [formControl]="title" />
+      <mat-error *ngIf="title.invalid">{{ getTitleErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Sistema d'aparellament: </mat-label>
+      <mat-select [formControl]="pairing" required>
+        <mat-option>--</mat-option>
+        <mat-option *ngFor="let option of pairings" [value]="option">
+          {{option.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="pairing.invalid">{{ getPairingErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Sistema de desempat: </mat-label>
+      <input matInput type="number" [formControl]="tiebreaker" />
+      <mat-error *ngIf="tiebreaker.invalid">{{ getTiebreakerErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <button id="sendButton" mat-raised-button color="primary" type="submit"
+    [disabled]="!tournamentForm.valid">CREAR TORNEIG</button>
+
+  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+
+</form>

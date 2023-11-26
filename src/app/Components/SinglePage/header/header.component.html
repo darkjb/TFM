@@ -1,0 +1,19 @@
+<header>
+  <h1>Aplicació per organitzar Tornejos d'escacs presencials</h1>
+
+  <div *ngIf="showNoAuthSection">
+    <button mat-button color="primary" (click)="goHome()">Inici</button>
+    <button mat-button color="primary" (click)="goLogin()">Login</button>
+    <button mat-button color="primary" (click)="goRegister()">Registre</button>
+    <button mat-button color="primary" (click)="goTournamentList()">Tornejos</button>
+    <button mat-button color="primary" (click)="goFaqs()">FAQS</button>
+  </div>
+  
+  <div *ngIf="showAuthSection">
+    <button mat-button color="primary" (click)="goHome()">Inici</button>
+    <button mat-button color="primary" (click)="goNewTournament()">Crear Torneig</button>
+    <button mat-button color="primary" (click)="goTournamentList()">Tornejos</button>
+    <button mat-button color="primary" (click)="goFaqs()">FAQS</button>
+    <button mat-button color="primary" (click)="goLogout()">Logout</button>
+  </div>
+</header>

@@ -1,0 +1,24 @@
+<h1>Formulari de Registre</h1>
+<form [formGroup]="loginForm" (ngSubmit)="login()">
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Correu electrònic: </mat-label>
+      <input matInput type="email" [formControl]="mail" />
+      <mat-error *ngIf="mail.invalid">{{ getMailErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Password: </mat-label>
+      <input matInput type="text" [formControl]="password" />
+      <mat-error *ngIf="password.invalid">{{ getPasswordErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <button id="sendButton" mat-raised-button color="primary" type="submit"
+    [disabled]="!loginForm.valid">LOGIN</button>
+
+  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+
+</form>
