@@ -13,29 +13,29 @@ import { DbChessService } from 'src/app/Services/tournament.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent {
-//  tournaments!: TournamentDTO[];
-//  showButtons: boolean;
+  tournaments!: TournamentDTO[];
+  showButtons: boolean;
   constructor(
-//    private dbChessService: DbChessService,
-//    private localStorageService: LocalStorageService,
-//    private sharedService: SharedService,
-//    private router: Router,
-//    private headerMenusService: HeaderMenusService
+    private dbChessService: DbChessService,
+    private localStorageService: LocalStorageService,
+    private sharedService: SharedService,
+    private router: Router,
+    private headerMenusService: HeaderMenusService
   ) {
-  //  this.showButtons = false;
-  //  this.loadTournaments();
+    this.showButtons = false;
+    this.loadTournaments();
   }
 
   ngOnInit(): void {
-  //  this.headerMenusService.headerManagement.subscribe(
-  //    (headerInfo: HeaderMenus) => {
-  //      if (headerInfo) {
-  //        this.showButtons = headerInfo.showAuthSection;
-  //      }
-  //    }
-  //  );
+    this.headerMenusService.headerManagement.subscribe(
+      (headerInfo: HeaderMenus) => {
+        if (headerInfo) {
+          this.showButtons = headerInfo.showAuthSection;
+        }
+      }
+    );
   }
-/*
+
   private async loadTournaments(): Promise<void> {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
@@ -50,5 +50,5 @@ export class HomeComponent {
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
-  }*/
+  }
 }

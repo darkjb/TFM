@@ -1,23 +1,31 @@
 <h1>Generació d'aparellaments</h1>
 
-<div *ngIf="tournamentStarted then tournamentHasStarted else tournamentHasNotStarted">
-    <h2>Torneig començat</h2>
-</div>
+<div *ngIf="tournamentStarted then tournamentHasStarted else tournamentHasNotStarted"></div>
 
 <ng-template #tournamentHasStarted>
-    Hola loko
+    <h2>Tingues en compte que, un cop realitzats els aparellaments, el resultat de la ronda actual ja no es podrà
+        modificar.</h2>
+
+    <mat-list>
+        <mat-list-item>Pots comprobar els <a [routerLink]="['/tournament/results/', id]"><b>resultats del
+                    torneig</b></a></mat-list-item>
+        <mat-list-item><button mat-button color="primary" (click)="doPairing()">Generar els
+                aparellaments</button></mat-list-item>
+        <mat-list-item><button mat-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">Detalls
+                del Torneig</button></mat-list-item>
+    </mat-list>
 </ng-template>
 
 <ng-template #tournamentHasNotStarted>
-    <h2>Tingues en compte que, un cop realitzats els aparellaments, el torneig es donarà per començat i no es podràn afegir
-        més participants.</h2>
+    <h2>Tingues en compte que, un cop realitzats els aparellaments, el torneig es donarà per començat i no es podràn
+        afegir més participants.</h2>
 
     <mat-list>
         <mat-list-item>Pots comprobar la <a [routerLink]="['/tournament/participants/', id]"><b>llista de
                     participants</b></a></mat-list-item>
         <mat-list-item><button mat-button color="primary" (click)="doPairing()">Generar els
                 aparellaments</button></mat-list-item>
-        <mat-list-item><button mat-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">Detalls del
-                Torneig</button></mat-list-item>
+        <mat-list-item><button mat-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">Detalls
+                del Torneig</button></mat-list-item>
     </mat-list>
 </ng-template>

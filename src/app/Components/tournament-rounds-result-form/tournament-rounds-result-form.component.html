@@ -1,1 +1,35 @@
-<p>tournament-rounds-result-form works!</p>
+<h1>Formulari d'introducció de Resultats</h1>
+
+<h2 *ngIf="finished">El torneig ja ha acabat, no es poden afegir més resultats.</h2>
+
+<form *ngIf="!finished" [formGroup]="participantForm" (ngSubmit)="sendForm()">
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Nom: </mat-label>
+      <input matInput type="text" [formControl]="name" />
+      <mat-error *ngIf="name.invalid">{{ getNameErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Cognom: </mat-label>
+      <input matInput type="text" [formControl]="surname" />
+      <mat-error *ngIf="surname.invalid">{{ getSurnameErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Elo: </mat-label>
+      <input matInput type="text" [formControl]="elo" />
+      <mat-error *ngIf="elo.invalid">{{ getEloErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <button id="sendButton" mat-raised-button color="primary" type="submit"
+    [disabled]="!participantForm.valid">CREAR PARTICIPANT</button>
+
+  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+
+</form>

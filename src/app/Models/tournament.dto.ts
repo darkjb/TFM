@@ -5,8 +5,10 @@ export class TournamentDTO {
   title: string;
   ownerId!: number;
   ownerName?: string;
-  arbiterId?: number;
-  moderatorId?: number;
+  arbiterId: number;
+  arbiterName?: string;
+  moderatorId: number;
+  moderatorName?: string;
 //  blog!: BlogDTO;
   pairing: number;
   tiebreaker: number;
@@ -19,6 +21,8 @@ export class TournamentDTO {
     this.pairing = pairing;
     this.tiebreaker = tiebreaker;
     this.started = 0;
-    this.finished= 0;
+    this.finished = 0;
+    this.arbiterId = 0;
+    this.moderatorId = 0;
   }
 }

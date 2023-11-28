@@ -26,18 +26,22 @@ export class TournamentComponent {
     this.permission = false;
     this.loadTournament();
   }
-  
+
   private async loadTournament(): Promise<void> {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
-    //  this.showButtons = true;
+      //  this.showButtons = true;
     }
     try {
       const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
       const list = await this.dbChessService.getTournamentById(identifier);
       this.tournament = list[0];
-      if(this.localStorageService.get('user_id')) {
-        this.permission = parseInt(this.localStorageService.get('user_id')!) == this.tournament.ownerId;
+      if (this.localStorageService.get('user_id')) {
+        this.permission =
+          parseInt(this.localStorageService.get('user_id')!) ==
+            this.tournament.ownerId ||
+          parseInt(this.localStorageService.get('user_id')!) ==
+            this.tournament.arbiterId;
       }
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
@@ -45,11 +49,15 @@ export class TournamentComponent {
   }
 
   goParticipantsList(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/participants/' + tournamentId.toString());
+    this.router.navigateByUrl(
+      '/tournament/participants/' + tournamentId.toString()
+    );
   }
 
   goClassification(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/classification/' + tournamentId.toString());
+    this.router.navigateByUrl(
+      '/tournament/classification/' + tournamentId.toString()
+    );
   }
 
   goOldResults(tournamentId: number): void {
@@ -61,14 +69,20 @@ export class TournamentComponent {
   }
 
   goAddParticipant(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/add_participant/' + tournamentId.toString());
+    this.router.navigateByUrl(
+      '/tournament/add_participant/' + tournamentId.toString()
+    );
   }
 
   goNewPairing(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/next_pairing/' + tournamentId.toString());
+    this.router.navigateByUrl(
+      '/tournament/next_pairing/' + tournamentId.toString()
+    );
   }
 
   goEnterResults(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/new_results/' + tournamentId.toString());
+    this.router.navigateByUrl(
+      '/tournament/new_results/' + tournamentId.toString()
+    );
   }
 }

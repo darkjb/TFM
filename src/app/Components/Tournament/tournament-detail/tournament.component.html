@@ -2,12 +2,12 @@
 
   <div *ngIf="tournament">
     <h4>
-      <b>Title: {{ tournament.title }}</b>
+      <b>Títol: {{ tournament.title }}</b>
     </h4>
 
-    <p>Created by: {{ tournament.ownerId }}</p>
-    <p>Pairing Type: {{ tournament.pairing }}</p>
-    <p>Tiebreak Type: {{ tournament.tiebreaker }}</p>
+    <p>Creat per: {{ tournament.ownerId }}</p>
+    <p>Aparellament: {{ tournament.pairing }}</p>
+    <p>Desempat: {{ tournament.tiebreaker }}</p>
     <mat-list>
       <mat-list-item><button mat-button color="primary" (click)="goParticipantsList(tournament.tournamentId)">Llista de
           Participants</button></mat-list-item>

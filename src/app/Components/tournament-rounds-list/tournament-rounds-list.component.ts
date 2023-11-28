@@ -58,4 +58,8 @@ export class TournamentRoundsListComponent {
   goResultDetail(tournamentId: string, roundNumber: string): void {
     this.router.navigateByUrl('/tournament/results/' + tournamentId + '/' + roundNumber);
   }
+  
+  goTournamentDetail(tournamentId: number): void {
+    this.router.navigateByUrl('/tournament/' + tournamentId.toString());
+  }
 }

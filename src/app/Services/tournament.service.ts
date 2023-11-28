@@ -59,7 +59,10 @@ export class DbChessService {
     );
   }
 
-  getResultsByRoundNumber(tournamentId: string, roundNumber: string): Promise<GameDTO[]> {
+  getResultsByRoundNumber(
+    tournamentId: string,
+    roundNumber: string
+  ): Promise<GameDTO[]> {
     this.controller = 'tournaments/games/';
     return lastValueFrom(
       this.http.get<GameDTO[]>(
@@ -74,6 +77,13 @@ export class DbChessService {
       this.http.get<ResultDTO[]>(
         this.urlServerApi + this.controller + tournamentId
       )
+    );
+  }
+
+  getUserName(userId: number): Promise<UserDTO[]> {
+    this.controller = 'users/name/';
+    return lastValueFrom(
+      this.http.get<UserDTO[]>(this.urlServerApi + this.controller + userId)
     );
   }
 

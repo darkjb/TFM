@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
+import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
+import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
 @Component({
@@ -12,6 +14,8 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 })
 export class ParticipantFormComponent {
   participant: ParticipantDTO;
+  tournament!: TournamentDTO;
+  started: boolean = true;
   name: FormControl;
   surname: FormControl;
   elo: FormControl;
@@ -22,9 +26,11 @@ export class ParticipantFormComponent {
   constructor(
     private formBuilder: FormBuilder,
     private dbChessService: DbChessService,
+    private sharedService: SharedService,
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
+    this.getTournament();
     this.isValidForm = null;
     this.participant = new ParticipantDTO(0, '', '', 0);
 
@@ -48,6 +54,16 @@ export class ParticipantFormComponent {
       surname: this.surname,
       elo: this.elo
     });
+  }
+
+  private async getTournament(): Promise<void> {    
+    try {
+      const list = await this.dbChessService.getTournamentById(this.activatedRoute.snapshot.paramMap.get('id')!);
+      this.tournament = list[0];
+      this.started = this.tournament.started === 1;
+    } catch (error: any) {
+      this.sharedService.errorLog(error.error);
+    }
   }
 
   getNameErrorMessage(): string {

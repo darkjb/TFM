@@ -94,7 +94,9 @@ export class TournamentFormComponent {
       tiebreaker: this.tiebreaker.value,
       ownerId: 0,
       started: 0,
-      finished: 0
+      finished: 0,
+      arbiterId: 0,
+      moderatorId: 0
     };
 
     this.tournament.ownerId = parseInt(this.localStorageService.get('user_id')!);

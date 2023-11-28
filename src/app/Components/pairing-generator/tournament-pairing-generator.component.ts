@@ -77,7 +77,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
       this.doNextPairing(pendingRound);
     } else {
       this.doFirstPairing();
-      this.doNextPairing(2);
+    //  this.doNextPairing(2);
       await this.setTournamentStarted();
     }
 

@@ -1,5 +1,8 @@
 <h1>Formulari d'introducció de Participants</h1>
-<form [formGroup]="participantForm" (ngSubmit)="sendForm()">
+
+<h2 *ngIf="started">El torneig ja ha començat, no es poden afegir més participants.</h2>
+
+<form *ngIf="!started" [formGroup]="participantForm" (ngSubmit)="sendForm()">
   <section>
     <mat-form-field appearance="fill">
       <mat-label>Nom: </mat-label>
