@@ -1,25 +1,31 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
-import { TournamentDTO } from 'src/app/Models/tournament.dto';
+import { ResultDTO } from 'src/app/Models/result.dto';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
 @Component({
   selector: 'app-tournament-rounds-result-form',
   templateUrl: './tournament-rounds-result-form.component.html',
-  styleUrls: ['./tournament-rounds-result-form.component.scss']
+  styleUrls: ['./tournament-rounds-result-form.component.scss'],
 })
 export class TournamentRoundsResultFormComponent {
-  participant: ParticipantDTO;
-  tournament!: TournamentDTO;
+  result: ResultDTO;
+  results!: ResultDTO[];
   finished: boolean = false;
-  name: FormControl;
-  surname: FormControl;
-  elo: FormControl;
+  board: FormControl;
+  score: FormControl;
+  boardNumbers: number[] = [];
+  scoreOptions: string[] = ['Guanyen Blanques', 'Guanyen Negres', 'Taules'];
 
-  participantForm: FormGroup;
+  resultForm: FormGroup;
   isValidForm: boolean | null;
 
   constructor(
@@ -29,108 +35,129 @@ export class TournamentRoundsResultFormComponent {
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
-    this.getTournament();
+    this.getResults();
     this.isValidForm = null;
-    this.participant = new ParticipantDTO(0, '', '', 0);
+    this.result = new ResultDTO('', '', 0);
 
-    this.name = new FormControl(this.participant.name, [
-      Validators.required,
-      Validators.maxLength(30),
-    ]);
+    this.board = new FormControl(this.result.boardNumber, Validators.required);
 
-    this.surname = new FormControl(this.participant.surname, [
-      Validators.required,
-      Validators.maxLength(30),
-    ]);
+    this.score = new FormControl(this.result.result, Validators.required);
 
-    this.elo = new FormControl(this.participant.elo, [
-      Validators.required,
-      Validators.pattern("[0-9]+"),
-    ]);
-
-    this.participantForm = this.formBuilder.group({
-      name: this.name,
-      surname: this.surname,
-      elo: this.elo
+    this.resultForm = this.formBuilder.group({
+      name: this.board,
+      surname: this.score,
     });
   }
 
-  private async getTournament(): Promise<void> {    
+  private async getResults(): Promise<void> {
     try {
-      const list = await this.dbChessService.getTournamentById(this.activatedRoute.snapshot.paramMap.get('id')!);
-      this.tournament = list[0];
-      this.finished = this.tournament.finished === 1;
+      this.results = await this.dbChessService.getLastResults(
+        this.activatedRoute.snapshot.paramMap.get('id')!
+      );
+      this.results.forEach((res) => this.boardNumbers.push(res.boardNumber));
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
+    console.log(this.results);
   }
 
-  getNameErrorMessage(): string {
+  getBoardErrorMessage(): string {
     let message = '';
 
-    if (this.name.hasError('required')) {
-      message = 'El nom és obligatori';
-    }
-
-    if (this.name.hasError('maxlength')) {
-      message = 'El nom no pot tenir més de 30 caràcters';
+    if (this.board.hasError('required')) {
+      message = 'És obligatori indicar el Taulell de Joc.';
     }
 
     return message;
   }
 
-  getSurnameErrorMessage(): string {
+  getScoreErrorMessage(): string {
     let message = '';
 
-    if (this.surname.hasError('required')) {
-      message = 'El cognom és obligatori';
-    }
-
-    if (this.surname.hasError('maxlength')) {
-      message = 'El cognom no pot tenir més de 30 caràcters';
-    }
-
-    return message;
-  }
-
-  getEloErrorMessage(): string {
-    let message = '';
-
-    if (this.elo.hasError('required')) {
-      message = "El elo és obligatori. Si no en té, indica 0.";
-    }
-
-    if (this.elo.hasError('pattern')) {
-      message = "El elo ha de ser numèric";
+    if (this.board.hasError('required')) {
+      message = 'És obligatori indicar el Resultat de la Partida.';
     }
 
     return message;
   }
 
   async sendForm(): Promise<void> {
-    this.participant = {
-      participantId: 0,
-      tournamentId: parseInt(this.activatedRoute.snapshot.paramMap.get('id')!),
-      name: this.name.value,
-      surname: this.surname.value,
-      elo: this.elo.value,
-      wins: 0,
-      ties: 0,
-      loses: 0,
-      white: 0,
-      black: 0,
-      last: ''
+    this.result = {
+      tournamentId: this.results[0].tournamentId,
+      roundNumber: this.results[0].roundNumber,
+      boardNumber: this.board.value,
+      roundEnded: 0,
+      player1: 0,
+      player2: 0,
+      result: this.score.value,
     };
 
+    this.transformResult();
 
-    if (await this.dbChessService.createParticipant(this.participant)) {
-      window.alert('Participant afegit correctament =)');
+    console.log(this.result.tournamentId);
+    console.log(this.result.roundNumber);
+    console.log(this.result.boardNumber);
+
+    const res = await this.dbChessService.getResult(
+      this.result.tournamentId,
+      this.result.roundNumber,
+      this.result.boardNumber
+    );
+
+    if (res[0].result == '') {
+      try {
+        await this.dbChessService.updateResult(this.result);
+        let player1: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player1.toString()));
+        let player2: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player2.toString()));
+        if (this.result.result == 'W') {
+          player1[0].wins++;
+          player2[0].loses++;
+        } else if (this.result.result == 'B') {
+          player1[0].loses++;
+          player2[0].wins++;
+        } else {
+          player1[0].ties++;
+          player2[0].ties++;
+        }
+        player1[0].white++;
+        player2[0].black++;
+        await this.dbChessService.updateParticipant(player1[0]);
+        await this.dbChessService.updateParticipant(player2[0]);
+        await this.checkRoundEnd();
+      } catch (error: any) {
+        this.sharedService.errorLog(error.error);
+      }
     } else {
-      window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
+      window.alert(`El resultat d'aquest tauler ja ha estat introduït.`);
     }
   }
 
+  private transformResult(): void {
+    if (this.result.result == 'Guanyen Blanques') this.result.result = 'W';
+    if (this.result.result == 'Guanyen Negres') this.result.result = 'B';
+    if (this.result.result == 'Taules') this.result.result = 'X';
+  }
+
+  private async checkRoundEnd(): Promise<void> {
+    if (
+      (await this.dbChessService.checkRoundEnd(
+        this.result.tournamentId,
+        this.result.roundNumber
+      )) == 0
+    ) {
+      try {
+        await this.dbChessService.setRoundEnded(this.result);
+      } catch (error: any) {
+        this.sharedService.errorLog(error.error);
+      }
+    }
+  }
+
+  goTournamentDetail(): void {
+    this.router.navigateByUrl('/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!);
+  }
+
   mostrarDatos(): void {
-    console.log(this.participant);
+    console.log(this.results);
   }
 }

@@ -24,7 +24,12 @@
   <section>
     <mat-form-field appearance="fill">
       <mat-label>Sistema de desempat: </mat-label>
-      <input matInput type="number" [formControl]="tiebreaker" />
+      <mat-select [formControl]="tiebreaker" required>
+        <mat-option>--</mat-option>
+        <mat-option *ngFor="let option of tiebreakers" [value]="option">
+          {{option.name}}
+        </mat-option>
+      </mat-select>
       <mat-error *ngIf="tiebreaker.invalid">{{ getTiebreakerErrorMessage() }}</mat-error>
     </mat-form-field>
   </section>
@@ -32,6 +37,6 @@
   <button id="sendButton" mat-raised-button color="primary" type="submit"
     [disabled]="!tournamentForm.valid">CREAR TORNEIG</button>
 
-  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+<!--   <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>  -->
 
 </form>

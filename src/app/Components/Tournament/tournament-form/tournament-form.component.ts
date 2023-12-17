@@ -19,9 +19,13 @@ export class TournamentFormComponent {
   tournamentForm: FormGroup;
   isValidForm: boolean | null;
   pairings: any[] = [
-    {name: "hola", value: 1},
-    {name: "adios", value: 2}
-  ]
+    {name: "Sistema Suís", value: 1},
+    {name: "Round Robin", value: 2}
+  ];
+  tiebreakers: any[] = [
+    {name: "Buchholz", value: 1},
+    {name: "Sonneborn-Berger", value: 2}
+  ];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -91,22 +95,20 @@ export class TournamentFormComponent {
       tournamentId: 0,
       title: this.title.value,
       pairing: this.pairing.value.value,
-      tiebreaker: this.tiebreaker.value,
+      tiebreaker: this.tiebreaker.value.value,
       ownerId: 0,
       started: 0,
-      finished: 0,
-      arbiterId: 0,
-      moderatorId: 0
+      finished: 0
     };
 
     this.tournament.ownerId = parseInt(this.localStorageService.get('user_id')!);
-/*
+
     if (await this.dbChessService.createTournament(this.tournament)) {
       window.alert('Torneig creat correctament =)');
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
-    }*/
-    console.log(this.tournament);
+    }
+    //console.log(this.tournament);
   }
 
   mostrarDatos(): void {

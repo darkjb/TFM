@@ -1,1 +1,18 @@
-<p>tournament-blog-comment-form works!</p>
+<h1>Formulari de Creació de Torneig</h1>
+<form [formGroup]="commentForm" (ngSubmit)="sendForm()">
+  <section>
+    <mat-form-field appearance="fill">
+      <mat-label>Comentari: </mat-label>
+      <textarea matInput [formControl]="text"></textarea>
+      <mat-error *ngIf="text.invalid">{{ getTextErrorMessage() }}</mat-error>
+    </mat-form-field>
+  </section>
+
+  <button id="sendButton" mat-raised-button color="primary" type="submit" [disabled]="!commentForm.valid">AFEGIR
+    COMENTARI</button>
+
+  <button mat-raised-button color="primary" (click)="goTournamentDetail()">Detalls del Torneig</button>
+
+  <!--   <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>  -->
+
+</form>

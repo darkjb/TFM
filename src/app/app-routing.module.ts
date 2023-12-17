@@ -15,6 +15,8 @@ import { TournamentPairingNextComponent } from './Components/tournament-pairing-
 import { TournamentRoundsListComponent } from './Components/tournament-rounds-list/tournament-rounds-list.component';
 import { TournamentRoundsResultFormComponent } from './Components/tournament-rounds-result-form/tournament-rounds-result-form.component';
 import { TournamentRoundsDetailComponent } from './Components/tournament-rounds-detail/tournament-rounds-detail.component';
+import { TournamentBlogComponent } from './Components/tournament-blog/tournament-blog.component';
+import { TournamentBlogCommentFormComponent } from './Components/tournament-blog-comment-form/tournament-blog-comment-form.component';
 
 const routes: Routes = [
   {
@@ -72,6 +74,18 @@ const routes: Routes = [
   {
     path: 'tournament/new_results/:id',
     component: TournamentRoundsResultFormComponent,
+  },
+  {
+    path: 'tournament/blog/:id',
+    component: TournamentBlogComponent,
+  },
+  {
+    path: 'tournament/blog/add_comment/:id',
+    component: TournamentBlogCommentFormComponent,
+  },
+  {
+    path: 'tournament/blog/edit_comment/:id',
+    component: TournamentBlogCommentFormComponent,
   },
   {
     path: 'newTournament',

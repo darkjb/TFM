@@ -30,6 +30,10 @@
   <button id="sendButton" mat-raised-button color="primary" type="submit"
     [disabled]="!participantForm.valid">CREAR PARTICIPANT</button>
 
-  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+<!--  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button> -->
 
 </form>
+
+<button mat-raised-button color="primary" (click)="goTournamentDetail(id)">
+  Detalls del Torneig
+</button>

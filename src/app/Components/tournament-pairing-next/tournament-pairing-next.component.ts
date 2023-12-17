@@ -106,6 +106,7 @@ export class TournamentPairingNextComponent {
       this.blackSurNames.push(surname2);
     }
   }
+  
   goTournamentDetail(tournamentId: number): void {
     this.router.navigateByUrl('/tournament/' + tournamentId.toString());
   }

@@ -19,6 +19,7 @@ export class ParticipantFormComponent {
   name: FormControl;
   surname: FormControl;
   elo: FormControl;
+  id: number = 0;
 
   participantForm: FormGroup;
   isValidForm: boolean | null;
@@ -54,6 +55,8 @@ export class ParticipantFormComponent {
       surname: this.surname,
       elo: this.elo
     });
+
+    this.id = parseInt(this.activatedRoute.snapshot.paramMap.get('id')!);
   }
 
   private async getTournament(): Promise<void> {    
@@ -111,7 +114,7 @@ export class ParticipantFormComponent {
   async sendForm(): Promise<void> {
     this.participant = {
       participantId: 0,
-      tournamentId: parseInt(this.activatedRoute.snapshot.paramMap.get('id')!),
+      tournamentId: this.id,
       name: this.name.value,
       surname: this.surname.value,
       elo: this.elo.value,
@@ -129,6 +132,10 @@ export class ParticipantFormComponent {
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }
+  }
+
+  goTournamentDetail(tournamentId: number): void {
+    this.router.navigateByUrl('/tournament/' + tournamentId.toString());
   }
 
   mostrarDatos(): void {

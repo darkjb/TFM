@@ -27,7 +27,7 @@
   <section>
     <mat-form-field appearance="fill">
       <mat-label>Password: </mat-label>
-      <input matInput type="text" [formControl]="password" />
+      <input matInput type="password" [formControl]="password" />
       <mat-error *ngIf="password.invalid">{{ getPasswordErrorMessage() }}</mat-error>
     </mat-form-field>
   </section>
@@ -35,6 +35,6 @@
   <button id="sendButton" mat-raised-button color="primary" type="submit"
     [disabled]="!registerForm.valid">REGISTRAR</button>
 
-  <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button>
+<!--   <button mat-raised-button color="primary" type="button" (click)="mostrarDatos()">MOSTRAR DATOS</button> -->
 
 </form>

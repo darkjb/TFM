@@ -1,14 +1,17 @@
 export class CommentDTO {
-  CommentId!: string;
-  BlogId!: string;
-  userId!: string;
-  num_likes: number;
-  num_dislikes: number;
+  commentId!: number;
+  tournamentId!: number;
+  userId!: number;
+  ownerName?: string;
+  likes: number;
+  dislikes: number;
   publication_date: Date;
+  text: string;
 
-  constructor(num_likes: number, num_dislikes: number, publication_date: Date) {
-    this.num_likes = num_likes;
-    this.num_dislikes = num_dislikes;
-    this.publication_date = publication_date;
+  constructor() {
+    this.likes = 0;
+    this.dislikes = 0;
+    this.publication_date = new Date();
+    this.text = "";
   }
 }

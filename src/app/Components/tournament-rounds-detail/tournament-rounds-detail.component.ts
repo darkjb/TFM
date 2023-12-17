@@ -48,7 +48,7 @@ export class TournamentRoundsDetailComponent {
   private async loadData(): Promise<void> {
     const identifier1 = this.activatedRoute.snapshot.paramMap.get('id1')!;
     const identifier2 = this.activatedRoute.snapshot.paramMap.get('id2')!;
-    this.id = parseInt(identifier2);
+    this.id = parseInt(identifier1);
     await this.getGames(identifier1, identifier2);
   }
 

@@ -39,13 +39,15 @@ export class TournamentComponent {
       if (this.localStorageService.get('user_id')) {
         this.permission =
           parseInt(this.localStorageService.get('user_id')!) ==
-            this.tournament.ownerId ||
-          parseInt(this.localStorageService.get('user_id')!) ==
-            this.tournament.arbiterId;
+          this.tournament.ownerId;
       }
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
+  }
+
+  goBlogPage(tournamentId: number): void {
+    this.router.navigateByUrl('/tournament/blog/' + tournamentId.toString());
   }
 
   goParticipantsList(tournamentId: number): void {

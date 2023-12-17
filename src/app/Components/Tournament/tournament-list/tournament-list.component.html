@@ -10,8 +10,6 @@
         <p>Creat per: {{ tournament.ownerName }}</p>
         <p>Aparellament: {{ tournament.pairing }}</p>
         <p>Desempat: {{ tournament.tiebreaker }}</p>
-        <p>Àrbitre: {{ tournament.arbiterName }}</p>
-        <p>Moderador: {{ tournament.moderatorName }}</p>
       </mat-card-content>
       <mat-card-actions>
         <button mat-raised-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">

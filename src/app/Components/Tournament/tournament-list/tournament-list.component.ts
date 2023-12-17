@@ -59,8 +59,8 @@ export class TournamentListComponent {
   private async getNames(): Promise<void> {
     for(let i = 0; i < this.tournaments.length; i++) {
       this.tournaments[i].ownerName = await this.getName(this.tournaments[i].ownerId);
-      this.tournaments[i].arbiterName = await this.getName(this.tournaments[i].arbiterId);
-      this.tournaments[i].moderatorName = await this.getName(this.tournaments[i].moderatorId);
+//      this.tournaments[i].arbiterName = await this.getName(this.tournaments[i].arbiterId);
+//      this.tournaments[i].moderatorName = await this.getName(this.tournaments[i].moderatorId);
     }
   }
 
