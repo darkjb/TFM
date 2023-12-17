@@ -107,6 +107,9 @@ export class TournamentRoundsResultFormComponent {
     if (res[0].result == '') {
       try {
         await this.dbChessService.updateResult(this.result);
+        console.log(this.result);
+        this.result = (await this.dbChessService.getResult(this.result.tournamentId, this.result.roundNumber, this.result.boardNumber))[0];
+        console.log(this.result);
         let player1: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player1.toString()));
         let player2: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player2.toString()));
         if (this.result.result == 'W') {
@@ -119,11 +122,10 @@ export class TournamentRoundsResultFormComponent {
           player1[0].ties++;
           player2[0].ties++;
         }
-        player1[0].white++;
-        player2[0].black++;
         await this.dbChessService.updateParticipant(player1[0]);
         await this.dbChessService.updateParticipant(player2[0]);
         await this.checkRoundEnd();
+        window.alert('Resultat introduït correctament!');
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }

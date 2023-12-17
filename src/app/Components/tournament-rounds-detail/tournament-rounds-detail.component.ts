@@ -22,7 +22,8 @@ export class TournamentRoundsDetailComponent {
     'result2',
   ];
   games!: GameDTO[];
-  id: number = 0;
+  id1: number = 0;
+  id2: number = 0;
   // showButtons: boolean;
   constructor(
     private dbChessService: DbChessService,
@@ -48,7 +49,8 @@ export class TournamentRoundsDetailComponent {
   private async loadData(): Promise<void> {
     const identifier1 = this.activatedRoute.snapshot.paramMap.get('id1')!;
     const identifier2 = this.activatedRoute.snapshot.paramMap.get('id2')!;
-    this.id = parseInt(identifier1);
+    this.id1 = parseInt(identifier1);
+    this.id2 = parseInt(identifier2);
     await this.getGames(identifier1, identifier2);
   }
 

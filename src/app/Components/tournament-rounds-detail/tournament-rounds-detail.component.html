@@ -1,4 +1,4 @@
-<h2>Resultats de la ronda {{id}} </h2>
+<h2>Resultats de la ronda {{id2}} </h2>
 
 <div class="table">
   <table mat-table [dataSource]="games" class="mat-elevation-z8">
@@ -32,7 +32,7 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 
-  <button mat-raised-button color="primary" (click)="goTournamentDetail(id)">
+  <button mat-raised-button color="primary" (click)="goTournamentDetail(id1)">
     Detalls del Torneig
   </button>
 </div>
