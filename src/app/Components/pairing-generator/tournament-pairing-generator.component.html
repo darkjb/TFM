@@ -1,6 +1,15 @@
 <h1>Generació d'aparellaments</h1>
 
-<div *ngIf="tournamentStarted then tournamentHasStarted else tournamentHasNotStarted"></div>
+<h2 *ngIf="finished">El torneig ja ha finalitzat, no es poden realitzar més aparellaments.</h2>
+
+<div *ngIf="!finished">
+    <div *ngIf="tournamentStarted then tournamentHasStarted else tournamentHasNotStarted"></div>
+</div>
+
+<mat-list *ngIf="finished">
+    <mat-list-item><button mat-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">Detalls
+            del Torneig</button></mat-list-item>
+</mat-list>
 
 <ng-template #tournamentHasStarted>
     <h2>Tingues en compte que, un cop realitzats els aparellaments, el resultat de la ronda actual ja no es podrà

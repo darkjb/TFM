@@ -8,6 +8,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { ResultDTO } from 'src/app/Models/result.dto';
+import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
@@ -108,32 +109,65 @@ export class TournamentRoundsResultFormComponent {
       try {
         await this.dbChessService.updateResult(this.result);
         console.log(this.result);
-        this.result = (await this.dbChessService.getResult(this.result.tournamentId, this.result.roundNumber, this.result.boardNumber))[0];
+        this.result = (
+          await this.dbChessService.getResult(
+            this.result.tournamentId,
+            this.result.roundNumber,
+            this.result.boardNumber
+          )
+        )[0];
         console.log(this.result);
-        let player1: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player1.toString()));
-        let player2: ParticipantDTO[] = await (this.dbChessService.getParicipantById(this.result.tournamentId, this.result.player2.toString()));
-        if (this.result.result == 'W') {
-          player1[0].wins++;
-          player2[0].loses++;
-        } else if (this.result.result == 'B') {
-          player1[0].loses++;
-          player2[0].wins++;
-        } else {
-          player1[0].ties++;
-          player2[0].ties++;
-        }
+        let player1: ParticipantDTO[] =
+          await this.dbChessService.getParicipantById(
+            this.result.tournamentId,
+            this.result.player1.toString()
+          );
+        let player2: ParticipantDTO[] =
+          await this.dbChessService.getParicipantById(
+            this.result.tournamentId,
+            this.result.player2.toString()
+          );
+        this.countResult(player1[0], player2[0]);
         await this.dbChessService.updateParticipant(player1[0]);
         await this.dbChessService.updateParticipant(player2[0]);
-        await this.checkRoundEnd();
         window.alert('Resultat introduït correctament!');
+        await this.checkRoundEnd();
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }
     } else {
-      window.alert(`El resultat d'aquest tauler ja ha estat introduït.`);
+      this.showAlert();
     }
   }
 
+  private countResult(p1: ParticipantDTO, p2: ParticipantDTO): void {
+    if (this.result.result == 'W') {
+      p1.wins++;
+      p2.loses++;
+    } else if (this.result.result == 'B') {
+      p1.loses++;
+      p2.wins++;
+    } else {
+      p1.ties++;
+      p2.ties++;
+    }
+  }
+
+  private showAlert(): void {
+    if (this.result.result === 'W') {
+      window.alert(
+        `El resultat d'aquest tauler ja ha estat introduït, han guanyat les Blanques`
+      );
+    } else if (this.result.result === 'B') {
+      window.alert(
+        `El resultat d'aquest tauler ja ha estat introduït, han guanyat les Negres`
+      );
+    } else {
+      window.alert(
+        `El resultat d'aquest tauler ja ha estat introduït, han sigut Taules`
+      );
+    }
+  }
   private transformResult(): void {
     if (this.result.result == 'Guanyen Blanques') this.result.result = 'W';
     if (this.result.result == 'Guanyen Negres') this.result.result = 'B';
@@ -149,6 +183,42 @@ export class TournamentRoundsResultFormComponent {
     ) {
       try {
         await this.dbChessService.setRoundEnded(this.result);
+        window.alert('La Ronda ha Finalitzat!');
+      } catch (error: any) {
+        this.sharedService.errorLog(error.error);
+      }
+      await this.checkTournamentEnd();
+    }
+  }
+
+  private async checkTournamentEnd(): Promise<void> {
+    const tournament: TournamentDTO = (
+      await this.dbChessService.getTournamentById(this.result.tournamentId)
+    )[0];
+    let n: number = await this.dbChessService.getNumberOfParticipants(
+      tournament.tournamentId
+    );
+    let finalRound: number;
+    if (tournament.pairing === 1) {
+      finalRound = Math.ceil(Math.log2(n));
+    } else {
+      if (n % 2 === 0) {
+        finalRound = n - 1;
+      } else {
+        finalRound = n;
+      }
+    }
+    await this.endTournament(finalRound, tournament);
+    window.alert('El Torneig ha Finalitzat!');
+  }
+
+  private async endTournament(
+    finalRound: number,
+    tournament: TournamentDTO
+  ): Promise<void> {
+    if (this.result.roundNumber == finalRound.toString()) {
+      try {
+        await this.dbChessService.setTournamentFinished(tournament);
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }
@@ -156,7 +226,9 @@ export class TournamentRoundsResultFormComponent {
   }
 
   goTournamentDetail(): void {
-    this.router.navigateByUrl('/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!);
+    this.router.navigateByUrl(
+      '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
+    );
   }
 
   mostrarDatos(): void {

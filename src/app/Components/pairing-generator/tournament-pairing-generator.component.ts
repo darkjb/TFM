@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { GameDTO } from 'src/app/Models/game.dto.js';
 import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
+import { PlayerDTO } from 'src/app/Models/player.dto';
 import { ResultDTO } from 'src/app/Models/result.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
@@ -23,33 +24,25 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   newTournament!: boolean;
   numPlayers!: number;
   haveBye!: boolean;
+  finished: boolean = true;
   tournamentStarted: boolean;
+  bergerTable: number[][] = [];
 
   constructor(
     private dbChessService: DbChessService,
     private activatedRoute: ActivatedRoute,
     private sharedService: SharedService,
-    private router: Router,
-    private headerMenusService: HeaderMenusService
+    private router: Router
   ) {
-    // this.showButtons = false;
     this.getId();
     this.tournamentStarted = false;
-    console.log(this.tournamentStarted);
   }
 
   async ngOnInit(): Promise<void> {
     await this.getTournamentData();
-    this.editBooleans(this.tournament);
     this.newTournament = !this.tournament.started;
-    if (this.tournament.started == 1) {
-      this.tournamentStarted = true;
-    }
-    console.log(this.tournamentStarted);
-    console.log(this.tournament.started);
-  }
-  private editBooleans(tournament: TournamentDTO): void {
-    console.log(tournament);
+    this.tournamentStarted = this.tournament.started === 1;
+    this.finished = this.tournament.finished === 1;
   }
 
   private async getId(): Promise<void> {
@@ -59,7 +52,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
 
   private async getTournamentData(): Promise<void> {
     const tournaments: TournamentDTO[] =
-      await this.dbChessService.getTournamentById('' + this.id);
+      await this.dbChessService.getTournamentById(this.id.toString());
     this.tournament = tournaments[0];
   }
 
@@ -68,39 +61,37 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     await this.getParticipants();
     await this.getResults();
 
+    let playersArray: number[] = [];
+    this.players.forEach((player) => {
+      playersArray.push(player.participantId);
+    });
+
+    this.bergerTable = this.generateBergerTable(playersArray);
+
+    // Imprimir la taula Berger
+    //    console.log('Taula Berger:');
+    //    for (const row of this.bergerTable) {
+    //      console.log(row);
+    //    }
+
     if (this.results.length > 0) {
       const pendingRound = this.lastRoundPending();
-      console.log(pendingRound);
       if (pendingRound !== 0) {
-        window.alert('La Ronda ' + pendingRound + 'no ha finalitzat');
+        window.alert('La Ronda ' + pendingRound + ' no ha finalitzat');
       } else {
         this.doNextPairing(
           parseInt(this.results[this.results.length - 1].roundNumber) + 1
         );
-        this.pairing.forEach(async (result) => {
-          
-        });
         window.alert('Aparellament creat correctament =)');
-        this.goNextPairing(this.id);
+        //  this.goNextPairing(this.id);
       }
     } else {
-      if (
-        (await this.dbChessService.getNumberOfParticipants(this.id)) % 2 ==
-        0
-      ) {
-      //Si tenim un nombre senar de participants, creem el participant BYE per al jugador que no juga en cada ronda
-        const bye = new ParticipantDTO(this.id, 'BYE', '', 0);
-        await this.dbChessService.createParticipant(bye);
-      }
       this.doFirstPairing();
-      await this.setTournamentStarted();
-      this.pairing.forEach(async (result) => {
-        await this.createResults(result);
-      });
       window.alert('Aparellament creat correctament =)');
       this.goNextPairing(this.id);
     }
   }
+
   private async setTournamentStarted() {
     this.tournament.started = 1;
     try {
@@ -114,9 +105,12 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   private async getParticipants(): Promise<void> {
     //Recuperem els participants del torneig
     try {
-      this.players = await this.dbChessService.getParticipants('' + this.id);
+      this.players = await this.dbChessService.getParticipants(
+        this.id.toString()
+      );
       this.numPlayers = this.players.length;
-      if (!(this.numPlayers % 2 == 0)) {
+      if (!(this.numPlayers % 2 === 0)) {
+        // Si tenim un nombre imparell de participants, generem el participant fictici BYE
         this.players.push(new ParticipantDTO(this.id, 'Bye', '', 0));
         this.numPlayers++;
         this.haveBye = true;
@@ -124,6 +118,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
+    console.log(this.players);
   }
 
   private async getResults(): Promise<void> {
@@ -132,178 +127,78 @@ export class TournamentPairingGeneratorComponent implements OnInit {
       this.results = [];
     } else {
       try {
-        this.results = await this.dbChessService.getResults('' + this.id);
+        this.results = await this.dbChessService.getResults(this.id.toString());
+        console.log(this.results);
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }
     }
   }
-  private doFirstPairing(): void {
+  private async doFirstPairing(): Promise<void> {
     //Funció que genera el primer aparellament
     for (let i: number = 0; i < this.numPlayers / 2; i++) {
-      let pair: ResultDTO = new ResultDTO('' + this.id, '1', i + 1);
+      let pair: ResultDTO = new ResultDTO(this.id.toString(), '1', i + 1);
       pair.player1 = this.players[i].participantId;
       pair.player2 = this.players[this.players.length - i - 1].participantId;
       this.pairing.push(pair);
     }
+
+    await this.setTournamentStarted();
+    this.pairing.forEach(async (result) => {
+      await this.createResults(result);
+    });
   }
 
   private doNextPairing(round: number): void {
     //Funció que genera els aparellaments del segon en endavant
-    const nGroups: number = 2 * round + 1;
-    const groups: ParticipantDTO[][] = this.getPlayerGroups(nGroups);
-    //    const pGroups: ParticipantDTO[][] = this.getPlayerPlayedGroups();
 
-    if (false) {
-      // Aparellament en construcció
-      let boardNumber = 1;
-      for (let i: number = nGroups - 1; i >= 0; i--) {
-        if (groups[i].length % 2 !== 0) {
-          groups[i - 1].push(groups[i].pop()!);
-        }
-        for (let j: number = 0; j < groups[i].length; ) {
-          if (groups[i].length > 1) {
-            const firstPlayer: number = Math.floor(
-              Math.random() * groups[i].length
-            );
-            const p1: ParticipantDTO = groups[i].splice(firstPlayer, 1)[0];
-            /*
-          const groupP2: ParticipantDTO[] = groups[i].filter((elem) => {
-            !pGroups[p1.participantId].includes(elem)
-          });
-          */
-            //Faltaria eliminar, dels que queden, els que ja han jugat contra el p1
-            //Faltaria també intentar prioritzar no repetir color en partides successives
+    if (this.tournament.pairing === 1) {
+      this.doSwissPairing(round);
+    } else if (this.tournament.pairing === 2) {
+      this.doRobinsonPairing(round);
+    }
 
-            const secondPlayer: number = Math.floor(
-              Math.random() * groups[i].length
-            );
-            const p2: ParticipantDTO = groups[i].splice(secondPlayer, 1)[0];
+    this.pairing.forEach(async (result) => {
+      await this.createResults(result);
+    });
+  }
 
-            let pair: ResultDTO = new ResultDTO(
-              '' + this.id,
-              '' + (round + 1),
-              boardNumber++
-            );
-            pair.player1 = p1.participantId;
-            pair.player2 = p2.participantId;
-            this.pairing.push(pair);
-          }
-        }
+  private async doRobinsonPairing(round: number): Promise<void> {
+    const p = this.bergerTable[round - 1];
+
+    for (let i = 0; i < this.players.length; i += 2) {
+      let pair: ResultDTO = new ResultDTO(
+        this.id.toString(),
+        round.toString(),
+        1
+      );
+      pair.boardNumber = i / 2 + 1;
+      pair.player1 = p[i];
+      pair.player2 = p[i + 1];
+
+      if (pair.player1 === 0) {
+        pair.result = 'B';
+        let player: ParticipantDTO[] =
+          await this.dbChessService.getParicipantById(
+            this.id.toString(),
+            pair.player2.toString()
+          );
+        player[0].wins++;
+        await this.dbChessService.updateParticipant(player[0]);
       }
-    } else {
-      //Funció que genera el aparellament N provisionalment per un Round Robin de 8
 
-      if (this.numPlayers === 8) {
-        let pair: ResultDTO = new ResultDTO('' + this.id, '' + round, 1);
-        switch (round) {
-          case 2:
-            pair.player1 = this.players[7].participantId;
-            pair.player2 = this.players[4].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[5].participantId;
-            pair.player2 = this.players[3].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[6].participantId;
-            pair.player2 = this.players[2].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[0].participantId;
-            pair.player2 = this.players[1].participantId;
-            this.createResults(pair);
-            break;
-          case 3:
-            pair.player1 = this.players[1].participantId;
-            pair.player2 = this.players[7].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[2].participantId;
-            pair.player2 = this.players[0].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[3].participantId;
-            pair.player2 = this.players[6].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[4].participantId;
-            pair.player2 = this.players[5].participantId;
-            this.createResults(pair);
-            break;
-          case 4:
-            pair.player1 = this.players[7].participantId;
-            pair.player2 = this.players[5].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[6].participantId;
-            pair.player2 = this.players[4].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[0].participantId;
-            pair.player2 = this.players[3].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[1].participantId;
-            pair.player2 = this.players[2].participantId;
-            this.createResults(pair);
-            break;
-          case 5:
-            pair.player1 = this.players[2].participantId;
-            pair.player2 = this.players[7].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[3].participantId;
-            pair.player2 = this.players[1].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[4].participantId;
-            pair.player2 = this.players[0].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[5].participantId;
-            pair.player2 = this.players[6].participantId;
-            this.createResults(pair);
-            break;
-          case 6:
-            pair.player1 = this.players[7].participantId;
-            pair.player2 = this.players[6].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[0].participantId;
-            pair.player2 = this.players[5].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[1].participantId;
-            pair.player2 = this.players[4].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[2].participantId;
-            pair.player2 = this.players[3].participantId;
-            this.createResults(pair);
-            break;
-          case 7:
-            pair.player1 = this.players[3].participantId;
-            pair.player2 = this.players[7].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 2;
-            pair.player1 = this.players[4].participantId;
-            pair.player2 = this.players[2].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 3;
-            pair.player1 = this.players[5].participantId;
-            pair.player2 = this.players[1].participantId;
-            this.createResults(pair);
-            pair.boardNumber = 4;
-            pair.player1 = this.players[6].participantId;
-            pair.player2 = this.players[0].participantId;
-            this.createResults(pair);
-            break;
-          default:
-            window.alert(`S'ha acabat el torneig!`);
-            break;
-        }
+      if (pair.player2 === 0) {
+        pair.result = 'W';
+        let player: ParticipantDTO[] =
+          await this.dbChessService.getParicipantById(
+            this.id.toString(),
+            pair.player1.toString()
+          );
+        player[0].wins++;
+        await this.dbChessService.updateParticipant(player[0]);
       }
+
+      this.createResults(pair);
     }
   }
 
@@ -391,5 +286,226 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   goTournamentDetail(tournamentId: number): void {
     //Anem a la pàgina de Detall del Torneig
     this.router.navigateByUrl('/tournament/' + tournamentId.toString());
+  }
+
+  private generateBergerTable(players: number[]): number[][] {
+    const n: number = players.length;
+    const table: number[][] = [];
+
+    // Generar la taula Berger
+    for (let i = 0; i < n - 1; i++) {
+      const row: number[] = [];
+
+      // Parelles de jugadors per a cada ronda
+      for (let j = 0; j < n / 2; j++) {
+        const playerA = players[j];
+        const playerB = players[n - 1 - j];
+
+        // Alterna l'ordre de la parella per cada ronda
+        if (i % 2 === 1) {
+          row.push(playerB, playerA);
+        } else {
+          row.push(playerA, playerB);
+        }
+      }
+
+      // Rotar l'array de jugadors per mantenir l'equitat en les rondes següents
+      players.splice(1, 0, players.pop() as number);
+
+      table.push(row);
+    }
+
+    return table;
+  }
+
+  /*
+  interface Jugador {
+    id: number;
+    puntuacio: number;
+    valoracio: number;
+    aro: number;
+    historialColores: number[]; // 0 para negras, 1 para blancas
+}
+*/
+
+  private async doSwissPairing(round: number): Promise<void> {
+    console.log('aparellament suís');
+    console.log(this.tournament);
+    console.log(this.players);
+    console.log(this.results);
+
+    const swissPlayers: PlayerDTO[] = [];
+    this.fillPlayerData(swissPlayers);
+    console.log(swissPlayers);
+    this.sortPlayers(swissPlayers);
+  }
+
+  private fillPlayerData(array: PlayerDTO[]): void {
+    this.players.forEach((player) => {
+      let sPlayer: PlayerDTO = new PlayerDTO(player.participantId, player.elo);
+      let j: number = 0;
+
+      for (let i = 0; i < this.results.length; i++) {
+        if (this.results[i].player1 === player.participantId) {
+          sPlayer.historialColores[j] = 1;
+          let opponent: ParticipantDTO = this.getWhiteOpponent(i);
+          sPlayer.aro += opponent.elo;
+          j++;
+        }
+        if (this.results[i].player2 === player.participantId) {
+          sPlayer.historialColores[j] = 0;
+          let opponent: ParticipantDTO = this.getBlackOpponent(i);
+          sPlayer.aro += opponent.elo;
+          j++;
+        }
+      }
+
+      sPlayer.puntuacio = player.wins + 0.5 * player.ties;
+      sPlayer.aro = sPlayer.aro / j;
+
+      array.push(sPlayer);
+    });
+  }
+
+  private sortPlayers(array: PlayerDTO[]): void {
+    array.sort((a, b) => {
+      let diff: number;
+      if (b.puntuacio !== a.puntuacio) {
+        diff = b.puntuacio - a.puntuacio;
+      } else if (a.aro !== b.aro) {
+        diff = a.aro - b.aro;
+      } else {
+        diff = b.r - a.r;
+      }
+      return diff;
+    });
+  }
+
+  private getWhiteOpponent(n: number): ParticipantDTO {
+    let player: ParticipantDTO;
+    this.players.forEach((elem) => {
+      if (elem.participantId === this.results[n].player2) {
+        player = elem;
+      }
+    });
+    return player!;
+  }
+  private getBlackOpponent(n: number): ParticipantDTO {
+    let player: ParticipantDTO;
+    this.players.forEach((elem) => {
+      if (elem.participantId === this.results[n].player1) {
+        player = elem;
+      }
+    });
+    return player!;
+  }
+
+  private generarAparellamentSuísDubov(
+    jugadors: PlayerDTO[]
+  ): [PlayerDTO, PlayerDTO][] {
+    // Ordenar los jugadores por puntuación (descendente), ARO (ascendente) y valoración (descendente)
+    jugadors.sort((a, b) => {
+      if (b.puntuacio !== a.puntuacio) {
+        return b.puntuacio - a.puntuacio;
+      } else if (a.aro !== b.aro) {
+        return a.aro - b.aro;
+      } else {
+        return b.r - a.r;
+      }
+    });
+
+    const aparellaments: [PlayerDTO, PlayerDTO][] = [];
+
+    // Iterar sobre los aparellamientos de la ronda actual
+    for (let i = 0; i < jugadors.length; i += 2) {
+      const jugadorA = jugadors[i];
+      const jugadorB = jugadors[i + 1];
+
+      // Verificar si que no es jugui 3 vegades seguides amb el mateix color
+      let nextA = this.checkTwoLastRounds(jugadorA);
+      let nextB = this.checkTwoLastRounds(jugadorB);
+      if (nextA !== -1) {
+        // Intercambiar colores para evitar tres veces seguidas
+        if (nextA === 0) {
+          aparellaments.push([jugadorB, jugadorA]);
+          jugadorA.historialColores.push(0);
+          jugadorB.historialColores.push(1);
+        } else {
+          aparellaments.push([jugadorA, jugadorB]);
+          jugadorA.historialColores.push(1);
+          jugadorB.historialColores.push(0);
+        }
+      } else if (nextB !== -1) {
+        // Intercambiar colores para evitar tres veces seguidas
+        if (nextB === 0) {
+          aparellaments.push([jugadorA, jugadorB]);
+          jugadorA.historialColores.push(1);
+          jugadorB.historialColores.push(0);
+        } else {
+          aparellaments.push([jugadorB, jugadorA]);
+          jugadorA.historialColores.push(0);
+          jugadorB.historialColores.push(1);
+        }
+      } else {
+        // Determinar la preferencia de color
+        const preferenciaColorA = this.determinarPreferenciaColor(jugadorA);
+        const preferenciaColorB = this.determinarPreferenciaColor(jugadorB);
+
+        // Emparejar jugadores según preferencia de color
+        if (preferenciaColorA === 1 && preferenciaColorB === 0) {
+          aparellaments.push([jugadorA, jugadorB]);
+        } else if (preferenciaColorA === 0 && preferenciaColorB === 1) {
+          aparellaments.push([jugadorB, jugadorA]);
+        } else {
+          // Si ambos jugadores tienen la misma preferencia de color, emparejar según puntuación
+          aparellaments.push([jugadorA, jugadorB]);
+        }
+
+        // Actualizar historial de colores
+        jugadorA.historialColores.push(preferenciaColorA);
+        jugadorB.historialColores.push(preferenciaColorB);
+      }
+    }
+
+    return aparellaments;
+  }
+
+  // Función para verificar si se juegan tres veces seguidas con el mismo color
+  private checkTwoLastRounds(jugador: PlayerDTO): number {
+    const historial: number[] = jugador.historialColores;
+    const numPartidas: number = historial.length;
+    let next: number = -1;
+
+    if (numPartidas >= 2) {
+      const penultim: number = historial[numPartidas - 2];
+      const ultim: number = historial[numPartidas - 1];
+
+      if (penultim === ultim) {
+        if (ultim === 0) {
+          next = 1;
+        } else {
+          next = 0;
+        }
+      }
+    }
+
+    return next;
+  }
+
+  // Función para determinar la preferencia de color de un jugador basada en su historial de colores
+  private determinarPreferenciaColor(jugador: PlayerDTO): number {
+    const historial: number[] = jugador.historialColores;
+    const numPartidas: number = historial.length;
+    // Determinar preferencia de color basada en el historial
+    const colorUltimaPartida: number = historial[numPartidas - 1];
+    let colorNextRound: number;
+
+    // Preferir el color opuesto al de la última partida
+    if (colorUltimaPartida === 0) {
+      colorNextRound = 1;
+    } else {
+      colorNextRound = 0;
+    }
+    return colorNextRound;
   }
 }

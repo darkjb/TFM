@@ -143,6 +143,12 @@ export class TournamentBlogComponent {
     }
   }
 
+  goTournamentDetail(): void {
+    this.router.navigateByUrl(
+      '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
+    );
+  }
+
   goAddComment(): void {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
     this.router.navigateByUrl('/tournament/blog/add_comment/' + identifier);

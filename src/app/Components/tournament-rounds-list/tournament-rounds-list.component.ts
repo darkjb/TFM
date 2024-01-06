@@ -47,7 +47,7 @@ export class TournamentRoundsListComponent {
 
   private async getResults(tournamentId: string): Promise<void> {
     try {
-      this.results = await this.dbChessService.getResults(tournamentId);
+      this.results = await this.dbChessService.resultsList(tournamentId);
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }

@@ -88,25 +88,49 @@ export class TournamentPairingNextComponent {
   private showPairing(): void {
     console.log(this.pairing);
     for (let i: number = 0; i < this.pairing.length; i++) {
-      const name1: string = this.participants.find(
-        (element) => element.participantId == this.pairing[i].player1
-      )!.name;
-      const surname1: string = this.participants.find(
-        (element) => element.participantId == this.pairing[i].player1
-      )!.surname;
-      const name2: string = this.participants.find(
-        (element) => element.participantId == this.pairing[i].player2
-      )!.name;
-      const surname2: string = this.participants.find(
-        (element) => element.participantId == this.pairing[i].player2
-      )!.surname;
+      let name1: string = 'BYE';
+      let name2: string = 'BYE';
+      let surname1: string = '';
+      let surname2: string = '';
+      if (this.pairing[i].player1 !== 0) {
+        name1 = this.getName1(i);
+        surname1 = this.getSurname1(i);
+      }
+      if (this.pairing[i].player2 !== 0) {
+        name2 = this.getName2(i);
+        surname2 = this.getSurname2(i);
+      }
       this.whiteNames.push(name1);
       this.blackNames.push(name2);
       this.whiteSurNames.push(surname1);
       this.blackSurNames.push(surname2);
     }
   }
-  
+
+  private getName1(n: number): string {
+    return this.participants.find(
+      (element) => element.participantId == this.pairing[n].player1
+    )!.name;
+  }
+
+  private getSurname1(n: number): string {
+    return this.participants.find(
+      (element) => element.participantId == this.pairing[n].player1
+    )!.surname;
+  }
+
+  private getName2(n: number): string {
+    return this.participants.find(
+      (element) => element.participantId == this.pairing[n].player2
+    )!.name;
+  }
+
+  private getSurname2(n: number): string {
+    return this.participants.find(
+      (element) => element.participantId == this.pairing[n].player2
+    )!.surname;
+  }
+
   goTournamentDetail(tournamentId: number): void {
     this.router.navigateByUrl('/tournament/' + tournamentId.toString());
   }

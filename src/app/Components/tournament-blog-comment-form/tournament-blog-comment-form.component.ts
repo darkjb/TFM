@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommentDTO } from 'src/app/Models/comment.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
@@ -9,7 +14,7 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 @Component({
   selector: 'app-tournament-blog-comment-form',
   templateUrl: './tournament-blog-comment-form.component.html',
-  styleUrls: ['./tournament-blog-comment-form.component.scss']
+  styleUrls: ['./tournament-blog-comment-form.component.scss'],
 })
 export class TournamentBlogCommentFormComponent {
   comment: CommentDTO;
@@ -46,7 +51,7 @@ export class TournamentBlogCommentFormComponent {
     }
 
     if (this.text.hasError('maxlength')) {
-      message = 'El títol no pot tenir més de 250 caràcters';
+      message = 'El text no pot tenir més de 250 caràcters';
     }
 
     return message;
@@ -60,27 +65,33 @@ export class TournamentBlogCommentFormComponent {
       likes: 0,
       dislikes: 0,
       publication_date: new Date(),
-      text: this.text.value
+      text: this.text.value,
     };
 
-    this.comment.tournamentId = parseInt(this.activatedRoute.snapshot.paramMap.get('id')!);
+    this.comment.tournamentId = parseInt(
+      this.activatedRoute.snapshot.paramMap.get('id')!
+    );
     this.comment.userId = parseInt(this.localStorageService.get('user_id')!);
 
     if (await this.dbChessService.createComment(this.comment)) {
       window.alert('Comentari afegit correctament =)');
-      this.goBlogPage(this.comment.tournamentId);
+      this.goBlogPage();
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }
     //console.log(this.tournament);
   }
-  
-  goBlogPage(tournamentId: number): void {
-    this.router.navigateByUrl('/tournament/blog/' + tournamentId.toString());
+
+  goBlogPage(): void {
+    this.router.navigateByUrl(
+      '/tournament/blog/' + this.activatedRoute.snapshot.paramMap.get('id')!
+    );
   }
-  
+
   goTournamentDetail(): void {
-    this.router.navigateByUrl('/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!);
+    this.router.navigateByUrl(
+      '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
+    );
   }
 
   mostrarDatos(): void {

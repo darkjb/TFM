@@ -60,6 +60,15 @@ export class DbChessService {
     );
   }
 
+  resultsList(tournamentId: string): Promise<ResultDTO[]> {
+    this.controller = 'tournaments/resultsList/';
+    return lastValueFrom(
+      this.http.get<ResultDTO[]>(
+        this.urlServerApi + this.controller + tournamentId
+      )
+    );
+  }
+
   getResult(
     tournamentId: string,
     roundNumber: string,
@@ -112,6 +121,13 @@ export class DbChessService {
     this.controller = 'reserved/setRoundEnded/';
     return lastValueFrom(
       this.http.patch<void>(this.urlServerApi + this.controller, result)
+    );
+  }
+
+  setTournamentFinished(tournament: TournamentDTO): Promise<void> {
+    this.controller = 'reserved/setTournamentFinished/';
+    return lastValueFrom(
+      this.http.patch<void>(this.urlServerApi + this.controller, tournament)
     );
   }
 
@@ -191,7 +207,10 @@ export class DbChessService {
     this.controller = 'reserved/participant';
     console.log(this.urlServerApi + this.controller);
     return lastValueFrom(
-      this.http.put<ParticipantDTO>(this.urlServerApi + this.controller, participant)
+      this.http.put<ParticipantDTO>(
+        this.urlServerApi + this.controller,
+        participant
+      )
     );
   }
 
