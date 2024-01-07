@@ -160,13 +160,7 @@ export class DbChessService {
       this.http.get<number>(this.urlServerApi + this.controller + tournamentId)
     );
   }
-  /*CreateTournament(tournament: TournamentDTO): Promise<TournamentDTO> {
-    this.controller = 'tournaments';
-    return lastValueFrom(
-      this.http.post<TournamentDTO>(this.urlServerApi + this.controller, tournament)
-    );
-  }*/
-
+  
   getUserLogin(user: UserDTO): Promise<any> {
     this.controller = 'users/auth';
     return lastValueFrom(

@@ -5,9 +5,10 @@
       <b>Títol: {{ tournament.title | titlecase }}</b>
     </h4>
 
-    <p>Creat per: {{ tournament.ownerId }}</p>
-    <p>Aparellament: {{ tournament.pairing }}</p>
-    <p>Desempat: {{ tournament.tiebreaker }}</p>
+    <p>Status: {{ tournament.status }}</p>
+    <p>Creat per: {{ tournament.ownerName }}</p>
+    <p>Aparellament: {{ tournament.pairingName }}</p>
+    <p>Desempat: {{ tournament.tiebreakerName }}</p>
     <mat-list>
       <mat-list-item><button mat-button color="primary" (click)="goBlogPage(tournament.tournamentId)">Blog del
           Torneig</button></mat-list-item>

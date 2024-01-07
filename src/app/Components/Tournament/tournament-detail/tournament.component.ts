@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
+import { UserDTO } from 'src/app/Models/user.dto';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
@@ -29,21 +30,73 @@ export class TournamentComponent {
 
   private async loadTournament(): Promise<void> {
     const userId = this.localStorageService.get('user_id');
-    if (userId) {
-      //  this.showButtons = true;
-    }
     try {
       const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
       const list = await this.dbChessService.getTournamentById(identifier);
       this.tournament = list[0];
-      if (this.localStorageService.get('user_id')) {
-        this.permission =
-          parseInt(this.localStorageService.get('user_id')!) ==
-          this.tournament.ownerId;
+      if (userId) {
+        this.permission = parseInt(userId) == this.tournament.ownerId;
       }
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
+
+    await this.getNames(this.tournament.ownerId);
+  }
+
+  private async getNames(id: number): Promise <void> {
+    this.tournament.ownerName = await this.getName(id);
+    this.tournament.pairingName = this.getPairing(this.tournament.pairing);
+    this.tournament.tiebreakerName = this.getTiebreaker(this.tournament.tiebreaker);
+    this.tournament.status = this.getStatus(this.tournament);
+  }
+
+  private async getName(id: number): Promise<string>  {
+    let name = "";
+    if (id > 0) {
+      try {
+        const users: UserDTO[] = await this.dbChessService.getUserName(id);
+        if (users.length > 0) {
+          name = users[0].name + ' ' + users[0].surname;
+        }
+      } catch (error: any) {
+        this.sharedService.errorLog(error.error);
+      }
+    }
+    return name;
+  }
+
+  private getPairing(p: number): string {
+    let pairing: string = '';
+    if (p === 1) {
+      pairing = 'Sistema Suís';
+    } else if (p === 2) {
+      pairing = 'Round Robin'
+    }
+    return pairing;
+  }
+
+  private getTiebreaker(t: number): string {
+    let tiebreaker: string = '';
+    if (t === 1) {
+      tiebreaker = 'Buchholz';
+    } else if (t === 2) {
+      tiebreaker = 'Sonneborn-Berger'
+    }
+    return tiebreaker;
+  }
+
+  private getStatus(tournament: TournamentDTO): string {
+    let status: string = '';
+    if (tournament.started === 0) {
+      status = 'Torneig no començat';
+    } else {
+      status = 'Torneig en marxa';
+    }
+    if (tournament.finished === 1) {
+      status = 'Torneig finalitzat';
+    }
+    return status;
   }
 
   goBlogPage(tournamentId: number): void {

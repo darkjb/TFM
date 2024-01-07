@@ -136,7 +136,7 @@ export class TournamentRoundsResultFormComponent {
         this.sharedService.errorLog(error.error);
       }
     } else {
-      this.showAlert();
+      this.showAlert(res[0].result);
     }
   }
 
@@ -153,12 +153,12 @@ export class TournamentRoundsResultFormComponent {
     }
   }
 
-  private showAlert(): void {
-    if (this.result.result === 'W') {
+  private showAlert(res: string): void {
+    if (res === 'W') {
       window.alert(
         `El resultat d'aquest tauler ja ha estat introduït, han guanyat les Blanques`
       );
-    } else if (this.result.result === 'B') {
+    } else if (res === 'B') {
       window.alert(
         `El resultat d'aquest tauler ja ha estat introduït, han guanyat les Negres`
       );
@@ -168,6 +168,7 @@ export class TournamentRoundsResultFormComponent {
       );
     }
   }
+  
   private transformResult(): void {
     if (this.result.result == 'Guanyen Blanques') this.result.result = 'W';
     if (this.result.result == 'Guanyen Negres') this.result.result = 'B';

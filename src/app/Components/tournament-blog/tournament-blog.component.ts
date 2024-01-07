@@ -74,12 +74,17 @@ export class TournamentBlogComponent {
 
   private async getTournament(tournamentId: string): Promise<void> {
     try {
-      this.tournament = (await this.dbChessService.getTournamentById(tournamentId))[0];
+      this.tournament = (
+        await this.dbChessService.getTournamentById(tournamentId)
+      )[0];
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
     if (this.localStorageService.get('user_id')) {
-      if (this.localStorageService.get('user_id')! == this.tournament.ownerId.toString())
+      if (
+        this.localStorageService.get('user_id')! ==
+        this.tournament.ownerId.toString()
+      )
         this.owner = true;
     }
   }
@@ -87,6 +92,8 @@ export class TournamentBlogComponent {
   private async getNames(): Promise<void> {
     for (let i = 0; i < this.comments.length; i++) {
       this.comments[i].ownerName = await this.getName(this.comments[i].userId);
+      console.log(this.comments[i]);
+      //this.comments[i].date = this.getDate(this.comments[i].publication_date);
     }
   }
 
@@ -114,6 +121,20 @@ export class TournamentBlogComponent {
       }
     }
     return name;
+  }
+
+  private getDate(date: Date): string {
+    // Obtenir els components de la data
+    const dia = date.getDate();
+    const mes = date.getMonth() + 1; // S'afegeix 1 perquè els mesos comencen amb 0
+    const any = date.getFullYear();
+
+    // Format de la data: dd/mm/yyyy
+    const dataTransformada = `${dia.toString().padStart(2, '0')}/${mes
+      .toString()
+      .padStart(2, '0')}/${any}`;
+
+    return dataTransformada;
   }
 
   async doLike(commentId: number): Promise<void> {

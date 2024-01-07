@@ -4,6 +4,7 @@ export class PlayerDTO {
   r: number;
   aro: number;
   historialColores: number[]; // 0 para negras, 1 para blancas
+  color: number;
 
   constructor(id: number, r: number) {
     this.id = id;
@@ -11,5 +12,6 @@ export class PlayerDTO {
     this.r = r;
     this.aro = 0;
     this.historialColores = [];
+    this.color = 0;
   }
 }

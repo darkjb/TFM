@@ -68,12 +68,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
 
     this.bergerTable = this.generateBergerTable(playersArray);
 
-    // Imprimir la taula Berger
-    //    console.log('Taula Berger:');
-    //    for (const row of this.bergerTable) {
-    //      console.log(row);
-    //    }
-
     if (this.results.length > 0) {
       const pendingRound = this.lastRoundPending();
       if (pendingRound !== 0) {
@@ -118,7 +112,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
-    console.log(this.players);
   }
 
   private async getResults(): Promise<void> {
@@ -128,7 +121,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     } else {
       try {
         this.results = await this.dbChessService.getResults(this.id.toString());
-        console.log(this.results);
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }
@@ -149,13 +141,12 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     });
   }
 
-  private doNextPairing(round: number): void {
+  private async doNextPairing(round: number): Promise<void> {
     //Funció que genera els aparellaments del segon en endavant
-
     if (this.tournament.pairing === 1) {
-      this.doSwissPairing(round);
+      await this.doSwissPairing(round);
     } else if (this.tournament.pairing === 2) {
-      this.doRobinsonPairing(round);
+      await this.doRobinsonPairing(round);
     }
 
     this.pairing.forEach(async (result) => {
@@ -164,85 +155,25 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   }
 
   private async doRobinsonPairing(round: number): Promise<void> {
+    // Agafem l'aparellament segons la Taula de Berger que correspon a la ronda actual
     const p = this.bergerTable[round - 1];
 
     for (let i = 0; i < this.players.length; i += 2) {
       let pair: ResultDTO = new ResultDTO(
         this.id.toString(),
         round.toString(),
-        1
+        0
       );
       pair.boardNumber = i / 2 + 1;
       pair.player1 = p[i];
       pair.player2 = p[i + 1];
 
-      if (pair.player1 === 0) {
-        pair.result = 'B';
-        let player: ParticipantDTO[] =
-          await this.dbChessService.getParicipantById(
-            this.id.toString(),
-            pair.player2.toString()
-          );
-        player[0].wins++;
-        await this.dbChessService.updateParticipant(player[0]);
+      if (this.haveBye) {
+        // Si tenim un BYE, mirem si juga en aquest aparellament
+        await this.checkByeBoard(pair);
       }
-
-      if (pair.player2 === 0) {
-        pair.result = 'W';
-        let player: ParticipantDTO[] =
-          await this.dbChessService.getParicipantById(
-            this.id.toString(),
-            pair.player1.toString()
-          );
-        player[0].wins++;
-        await this.dbChessService.updateParticipant(player[0]);
-      }
-
-      this.createResults(pair);
-    }
-  }
-
-  private getPlayerGroups(nGroups: number): ParticipantDTO[][] {
-    //Funció per dividir els participants segons la puntuació que porten al torneig
-    let groups: ParticipantDTO[][] = new Array<ParticipantDTO[]>(nGroups);
-
-    for (let i: number = 0; i < nGroups; i++) {
-      groups[i] = this.players.filter(
-        (player) => player.wins + 2 * player.ties === i
-      );
-    }
-
-    return groups;
-  }
-
-  private getPlayerPlayedGroups(): ParticipantDTO[][] {
-    //Generem els grups de participants que ja han jugat contra cada participant
-    let pGroups: ParticipantDTO[][] = [];
-    for (let i: number = 0; i < this.numPlayers; i++) {
-      this.results.forEach((result) => this.findPlayers(result, i, pGroups));
-    }
-    return pGroups;
-  }
-
-  private findPlayers(
-    result: ResultDTO,
-    i: number,
-    pGroups: ParticipantDTO[][]
-  ): void {
-    //Busquem els participants que ja han jugat contra el participant de players[i]
-    if (result.player1 == this.players[i].participantId) {
-      pGroups[i].push(
-        this.players.filter(
-          (player) => player.participantId == result.player2
-        )[0]
-      );
-    }
-    if (result.player2 == this.players[i].participantId) {
-      pGroups[i].push(
-        this.players.filter(
-          (player) => player.participantId == result.player1
-        )[0]
-      );
+      this.pairing.push(pair);
+      //this.createResults(pair);
     }
   }
 
@@ -318,26 +249,56 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     return table;
   }
 
-  /*
-  interface Jugador {
-    id: number;
-    puntuacio: number;
-    valoracio: number;
-    aro: number;
-    historialColores: number[]; // 0 para negras, 1 para blancas
-}
-*/
-
   private async doSwissPairing(round: number): Promise<void> {
-    console.log('aparellament suís');
-    console.log(this.tournament);
-    console.log(this.players);
-    console.log(this.results);
-
     const swissPlayers: PlayerDTO[] = [];
+
+    // Recuperem les dades necessàries de cada jugador per a poder fer l'aparellament
     this.fillPlayerData(swissPlayers);
-    console.log(swissPlayers);
-    this.sortPlayers(swissPlayers);
+
+    // Separem els jugadors per grups de puntuació
+    const playerGroups: PlayerDTO[][] = this.getPlayerGroups(
+      swissPlayers,
+      2 * round - 1
+    );
+
+    // I ordenem
+    this.sortGroups(playerGroups);
+
+    const wPlayers: PlayerDTO[][] = [];
+    const bPlayers: PlayerDTO[][] = [];
+
+    // A cada grup de puntuació separem per preferència de color
+    this.divideByColor(playerGroups, wPlayers, bPlayers);
+
+    let board: number = 1;
+    console.log(wPlayers);
+    console.log(bPlayers);
+
+    for (let i = wPlayers.length - 1; i >= 0; i--) {
+      for (let j = 0; j < wPlayers[i].length; j++) {
+        // Iterem per obtenir els jugadors de cada tauler
+        let pair: ResultDTO = new ResultDTO(
+          this.id.toString(),
+          round.toString(),
+          board
+        );
+
+        this.confirmRivals(wPlayers, bPlayers, i, j);
+
+        pair.player1 = wPlayers[i][j].id;
+        pair.player2 = bPlayers[i][j].id;
+
+        if (this.haveBye) {
+          // Si tenim un BYE, mirem si juga en aquest aparellament
+          await this.checkByeBoard(pair);
+        }
+
+        this.pairing.push(pair);
+        board++;
+      }
+    }
+    console.log(this.players);
+    console.log(this.pairing);
   }
 
   private fillPlayerData(array: PlayerDTO[]): void {
@@ -367,18 +328,38 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     });
   }
 
-  private sortPlayers(array: PlayerDTO[]): void {
+  private sortWhitePlayers(array: PlayerDTO[]): void {
     array.sort((a, b) => {
       let diff: number;
       if (b.puntuacio !== a.puntuacio) {
         diff = b.puntuacio - a.puntuacio;
-      } else if (a.aro !== b.aro) {
+      } else {
         diff = a.aro - b.aro;
+      }
+      return diff;
+    });
+  }
+
+  private sortBlackPlayers(array: PlayerDTO[]): void {
+    array.sort((a, b) => {
+      let diff: number;
+      if (b.puntuacio !== a.puntuacio) {
+        diff = b.puntuacio - a.puntuacio;
       } else {
         diff = b.r - a.r;
       }
       return diff;
     });
+  }
+
+  private balanceColors(wPlayers: PlayerDTO[], bPlayers: PlayerDTO[]): void {
+    while (wPlayers.length != bPlayers.length) {
+      if (wPlayers.length > bPlayers.length) {
+        bPlayers.push(wPlayers.pop()!);
+      } else {
+        wPlayers.push(bPlayers.pop()!);
+      }
+    }
   }
 
   private getWhiteOpponent(n: number): ParticipantDTO {
@@ -390,6 +371,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     });
     return player!;
   }
+
   private getBlackOpponent(n: number): ParticipantDTO {
     let player: ParticipantDTO;
     this.players.forEach((elem) => {
@@ -400,112 +382,192 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     return player!;
   }
 
-  private generarAparellamentSuísDubov(
-    jugadors: PlayerDTO[]
-  ): [PlayerDTO, PlayerDTO][] {
-    // Ordenar los jugadores por puntuación (descendente), ARO (ascendente) y valoración (descendente)
-    jugadors.sort((a, b) => {
-      if (b.puntuacio !== a.puntuacio) {
-        return b.puntuacio - a.puntuacio;
-      } else if (a.aro !== b.aro) {
-        return a.aro - b.aro;
+  private getPlayerGroups(
+    players: PlayerDTO[],
+    nGroups: number
+  ): PlayerDTO[][] {
+    //Funció per dividir els participants segons la puntuació que porten al torneig
+    let groups: PlayerDTO[][] = [];
+
+    for (let i: number = nGroups - 1; i >= 0; i--) {
+      groups[i] = players.filter((player) => 2 * player.puntuacio === i);
+      console.log(groups[i]);
+    }
+
+    return groups;
+  }
+
+  private sortGroups(groups: PlayerDTO[][]): void {
+    // Funció que comprova que a cada grup hi hagi un nombre parell de jugadors
+    for (let i: number = groups.length - 1; i > 0; i--) {
+      if (groups[i].length % 2 !== 0) {
+        // Si hi ha un nombre senar, movem un jugador al següent grup de puntuació
+        groups[i - 1].push(groups[i].pop()!);
+        // Ordenem per puntuació per si cal moure un jugador al següent grup, que sigui el de menor puntuació
+        groups[i - 1].sort((a, b) => {
+          return b.puntuacio - a.puntuacio;
+        });
+      }
+    }
+  }
+
+  private divideByColor(
+    playerGroups: PlayerDTO[][],
+    wPlayers: PlayerDTO[][],
+    bPlayers: PlayerDTO[][]
+  ): void {
+    for (let i = 0; i < playerGroups.length; i++) {
+      const whitePlayers: PlayerDTO[] = [];
+      const blackPlayers: PlayerDTO[] = [];
+
+      for (let j = 0; j < playerGroups[i].length; j++) {
+        playerGroups[i][j].color = this.ckeckColor(playerGroups[i][j]);
+        if (playerGroups[i][j].color === 0) {
+          blackPlayers.push(playerGroups[i][j]);
+        } else {
+          whitePlayers.push(playerGroups[i][j]);
+        }
+      }
+
+      // Ordenem amb diferent criteri depenent si els toca jugar amb blanques o amb negres
+      this.sortWhitePlayers(whitePlayers);
+      this.sortBlackPlayers(blackPlayers);
+
+      // Igualem nombre de jugadors que juguen amb blanques i amb negres
+      this.balanceColors(whitePlayers, blackPlayers);
+
+      // Tornem a ordenar per si s'han mogut jugadors d'un grup a un altre
+      this.sortWhitePlayers(whitePlayers);
+      this.sortBlackPlayers(blackPlayers);
+
+      wPlayers.push(whitePlayers);
+      bPlayers.push(blackPlayers);
+    }
+  }
+
+  private confirmRivals(
+    wPlayers: PlayerDTO[][],
+    bPlayers: PlayerDTO[][],
+    i: number,
+    j: number
+  ): void {
+    // Funció que confirma si l'aparellament del grup 'i', jugadors 'j' es pot dur a terme
+    // Si és l'últim grup de puntuació i no hi ha més jugadors, es permet repetir rival
+    let end: boolean = false; // Variable per controlar que no mirem indefinidament aparellaments al últim grup de puntuació
+    let n: number = 1;
+    while (this.checkPair(wPlayers[i][j].id, bPlayers[i][j].id) || end) {
+      console.log('grup ' + i + ', jugadors ' + j + ': iteració ' + n);
+      // Si aquest aparellament ja s'ha jugat, movem els jugadors
+      console.log(
+        wPlayers[i][j].id + ' ja ha jugat contra ' + bPlayers[i][j].id
+      );
+      if (j === wPlayers[i].length - 1) {
+        // Estem intentant aparellar l'últim jugador del grup, mirem si podem canviar amb un jugador del següent grup
+        end = this.changeGroup(bPlayers, i);
       } else {
-        return b.r - a.r;
+        if (j + n < bPlayers.length) {
+          // Encara queda algun jugador del grup per probar, canviem l'ordre i tornem a probar
+          this.reOrderPlayers(bPlayers[i], j, n);
+          n++;
+        } else {
+          // No queden jugadors del grup per probar, deixem l'ordre com estava
+          this.getOldOrder(bPlayers[i], j, n - 1);
+          n = 1;
+
+          // I mirem si podem canviar amb un jugador del següent grup
+          end = this.changeGroup(bPlayers, i);
+        }
+      }
+    }
+  }
+
+  private checkPair(id1: number, id2: number): boolean {
+    return this.checkGames(id1, id2) || this.checkGames(id2, id1);
+  }
+
+  private checkGames(p1: number, p2: number): boolean {
+    let b: boolean = false;
+    this.results.forEach((game) => {
+      if (game.player1 === p1 && game.player2 === p2) {
+        b = true;
       }
     });
-
-    const aparellaments: [PlayerDTO, PlayerDTO][] = [];
-
-    // Iterar sobre los aparellamientos de la ronda actual
-    for (let i = 0; i < jugadors.length; i += 2) {
-      const jugadorA = jugadors[i];
-      const jugadorB = jugadors[i + 1];
-
-      // Verificar si que no es jugui 3 vegades seguides amb el mateix color
-      let nextA = this.checkTwoLastRounds(jugadorA);
-      let nextB = this.checkTwoLastRounds(jugadorB);
-      if (nextA !== -1) {
-        // Intercambiar colores para evitar tres veces seguidas
-        if (nextA === 0) {
-          aparellaments.push([jugadorB, jugadorA]);
-          jugadorA.historialColores.push(0);
-          jugadorB.historialColores.push(1);
-        } else {
-          aparellaments.push([jugadorA, jugadorB]);
-          jugadorA.historialColores.push(1);
-          jugadorB.historialColores.push(0);
-        }
-      } else if (nextB !== -1) {
-        // Intercambiar colores para evitar tres veces seguidas
-        if (nextB === 0) {
-          aparellaments.push([jugadorA, jugadorB]);
-          jugadorA.historialColores.push(1);
-          jugadorB.historialColores.push(0);
-        } else {
-          aparellaments.push([jugadorB, jugadorA]);
-          jugadorA.historialColores.push(0);
-          jugadorB.historialColores.push(1);
-        }
-      } else {
-        // Determinar la preferencia de color
-        const preferenciaColorA = this.determinarPreferenciaColor(jugadorA);
-        const preferenciaColorB = this.determinarPreferenciaColor(jugadorB);
-
-        // Emparejar jugadores según preferencia de color
-        if (preferenciaColorA === 1 && preferenciaColorB === 0) {
-          aparellaments.push([jugadorA, jugadorB]);
-        } else if (preferenciaColorA === 0 && preferenciaColorB === 1) {
-          aparellaments.push([jugadorB, jugadorA]);
-        } else {
-          // Si ambos jugadores tienen la misma preferencia de color, emparejar según puntuación
-          aparellaments.push([jugadorA, jugadorB]);
-        }
-
-        // Actualizar historial de colores
-        jugadorA.historialColores.push(preferenciaColorA);
-        jugadorB.historialColores.push(preferenciaColorB);
-      }
-    }
-
-    return aparellaments;
+    return b;
   }
 
-  // Función para verificar si se juegan tres veces seguidas con el mismo color
-  private checkTwoLastRounds(jugador: PlayerDTO): number {
-    const historial: number[] = jugador.historialColores;
-    const numPartidas: number = historial.length;
-    let next: number = -1;
-
-    if (numPartidas >= 2) {
-      const penultim: number = historial[numPartidas - 2];
-      const ultim: number = historial[numPartidas - 1];
-
-      if (penultim === ultim) {
-        if (ultim === 0) {
-          next = 1;
-        } else {
-          next = 0;
-        }
-      }
-    }
-
-    return next;
+  private changeGroup(players: PlayerDTO[][], x: number): boolean {
+    // Si x > 0 canvia l'ultim jugador de players[x] amb el primer de players[x-1] i torna true
+    // Si x = 0 no fa res i torna false
+    let b: boolean = true;
+    if (x > 0) {
+      players[x - 1].push(players[x].pop()!);
+      players[x].push(players[x - 1].shift()!);
+      b = false;
+    } 
+    return b;
   }
 
-  // Función para determinar la preferencia de color de un jugador basada en su historial de colores
-  private determinarPreferenciaColor(jugador: PlayerDTO): number {
-    const historial: number[] = jugador.historialColores;
-    const numPartidas: number = historial.length;
-    // Determinar preferencia de color basada en el historial
-    const colorUltimaPartida: number = historial[numPartidas - 1];
+  private reOrderPlayers(
+    players: PlayerDTO[],
+    pos: number,
+    jump: number
+  ): void {
+    if (pos + jump < players.length) {
+      // Intercanvia els jugadors a les posicions pos i pos+jump
+      const temp = players[pos];
+      players[pos] = players[pos + jump];
+      players[pos + jump] = temp;
+    } else {
+      console.log('últim jugador del array');
+    }
+  }
+
+  private getOldOrder(players: PlayerDTO[], pos: number, jump: number) {
+    for (let i = jump; i > 0; i--) {
+      this.reOrderPlayers(players, pos, i);
+    }
+  }
+
+  // Funció que retorna la preferència de color d'un jugador en funció del seu historial de colors
+  private ckeckColor(player: PlayerDTO): number {
+    const historial: number[] = player.historialColores;
+    const games: number = historial.length;
+    // Determinar preferència de color basada en l'historial
+    const lastColor: number = historial[games - 1];
     let colorNextRound: number;
 
-    // Preferir el color opuesto al de la última partida
-    if (colorUltimaPartida === 0) {
+    // Preferir color oposat al de l'última partida
+    if (lastColor === 0) {
       colorNextRound = 1;
     } else {
       colorNextRound = 0;
     }
     return colorNextRound;
+  }
+
+  private async checkByeBoard(pair: ResultDTO): Promise<void> {
+    // Si el jugador amb blanques és el BYE, donem la victòria directament al jugador amb negres
+    if (pair.player1 === 0) {
+      pair.result = 'B';
+      let player: ParticipantDTO[] =
+        await this.dbChessService.getParicipantById(
+          this.id.toString(),
+          pair.player2.toString()
+        );
+      player[0].wins++;
+      await this.dbChessService.updateParticipant(player[0]);
+    }
+
+    // Si el jugador amb negres és el BYE, donem la victòria directament al jugador amb blanques
+    if (pair.player2 === 0) {
+      pair.result = 'W';
+      let player: ParticipantDTO[] =
+        await this.dbChessService.getParicipantById(
+          this.id.toString(),
+          pair.player1.toString()
+        );
+      player[0].wins++;
+      await this.dbChessService.updateParticipant(player[0]);
+    }
   }
 }

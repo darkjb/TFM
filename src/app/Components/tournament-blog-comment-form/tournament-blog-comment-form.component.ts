@@ -64,7 +64,6 @@ export class TournamentBlogCommentFormComponent {
       userId: 0,
       likes: 0,
       dislikes: 0,
-      publication_date: new Date(),
       text: this.text.value,
     };
 

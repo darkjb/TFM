@@ -1,4 +1,5 @@
-.container, .container > div {
+.container,
+.container > div {
   text-align: center;
 }
 
@@ -7,4 +8,7 @@
   max-width: 500px;
 }
 
-
+p,
+button {
+  margin: 10px;
+}

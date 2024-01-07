@@ -59,8 +59,9 @@ export class TournamentListComponent {
   private async getNames(): Promise<void> {
     for(let i = 0; i < this.tournaments.length; i++) {
       this.tournaments[i].ownerName = await this.getName(this.tournaments[i].ownerId);
-//      this.tournaments[i].arbiterName = await this.getName(this.tournaments[i].arbiterId);
-//      this.tournaments[i].moderatorName = await this.getName(this.tournaments[i].moderatorId);
+      this.tournaments[i].pairingName = this.getPairing(this.tournaments[i].pairing);
+      this.tournaments[i].tiebreakerName = this.getTiebreaker(this.tournaments[i].tiebreaker);
+      this.tournaments[i].status = this.getStatus(this.tournaments[i]);
     }
   }
 
@@ -77,6 +78,39 @@ export class TournamentListComponent {
       }
     }
     return name;
+  }
+
+  private getPairing(p: number): string {
+    let pairing: string = '';
+    if (p === 1) {
+      pairing = 'Sistema Suís';
+    } else if (p === 2) {
+      pairing = 'Round Robin'
+    }
+    return pairing;
+  }
+
+  private getTiebreaker(t: number): string {
+    let tiebreaker: string = '';
+    if (t === 1) {
+      tiebreaker = 'Buchholz';
+    } else if (t === 2) {
+      tiebreaker = 'Sonneborn-Berger'
+    }
+    return tiebreaker;
+  }
+
+  private getStatus(tournament: TournamentDTO): string {
+    let status: string = '';
+    if (tournament.started === 0) {
+      status = 'Torneig no començat';
+    } else {
+      status = 'Torneig en marxa';
+    }
+    if (tournament.finished === 1) {
+      status = 'Torneig finalitzat';
+    }
+    return status;
   }
 
   goTournamentDetail(tournamentId: number): void {

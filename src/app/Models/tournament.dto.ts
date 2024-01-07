@@ -6,7 +6,9 @@ export class TournamentDTO {
   ownerId!: number;
   ownerName?: string;
   pairing: number;
+  pairingName?: string;
   tiebreaker: number;
+  tiebreakerName?: string;
   started: number;
   finished: number;
   status?: string;

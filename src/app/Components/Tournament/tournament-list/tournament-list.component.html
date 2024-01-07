@@ -1,23 +1,23 @@
 <div class="container">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
-  <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let tournament of tournaments">
-    <mat-card class="card animate__animated animate__bounce animate__fadeIn">
-      <mat-card-header>
-        <mat-card-title>{{ tournament.title | titlecase }}</mat-card-title>
-        <mat-card-subtitle>Status: {{ tournament.status }}</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Creat per: {{ tournament.ownerName }}</p>
-        <p>Aparellament: {{ tournament.pairing }}</p>
-        <p>Desempat: {{ tournament.tiebreaker }}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">
-          Detalls del Torneig
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+    <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let tournament of tournaments">
+      <mat-card class="card animate__animated animate__bounce animate__fadeIn">
+        <mat-card-header>
+          <mat-card-title>{{ tournament.title | titlecase }}</mat-card-title>
+          <mat-card-subtitle>Status: {{ tournament.status }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Creat per: {{ tournament.ownerName }}</p>
+          <p>Aparellament: {{ tournament.pairingName }}</p>
+          <p>Desempat: {{ tournament.tiebreakerName }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="goTournamentDetail(tournament.tournamentId)">
+            Detalls del Torneig
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
 
   </div>
 </div>
