@@ -1,7 +1,5 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import {
-  Form,
   FormBuilder,
   FormControl,
   FormGroup,
@@ -28,8 +26,7 @@ export class RegisterComponent {
 
   constructor(
     private formBuilder: FormBuilder,
-    private dbChessService: DbChessService,
-    private router: Router
+    private dbChessService: DbChessService
   ) {
     this.isValidForm = null;
     this.user = new UserDTO('', '', '', '');
@@ -49,7 +46,11 @@ export class RegisterComponent {
       Validators.email,
     ]);
 
-    this.password = new FormControl(this.user.password, Validators.required);
+    this.password = new FormControl(this.user.password, [
+      Validators.required,
+      Validators.minLength(4),
+      Validators.maxLength(16),
+    ]);
 
     this.registerForm = this.formBuilder.group({
       name: this.name,
@@ -108,6 +109,14 @@ export class RegisterComponent {
       message = 'El password és obligatori';
     }
 
+    if (this.mail.hasError('minlength')) {
+      message = 'El password no pot tenir menys de 4 caràcters';
+    }
+
+    if (this.mail.hasError('maxlength')) {
+      message = 'El password no pot tenir més de 16 caràcters';
+    }
+
     return message;
   }
 
@@ -121,14 +130,10 @@ export class RegisterComponent {
     };
 
     try {
-      await this.dbChessService.createUser(this.user)
+      await this.dbChessService.createUser(this.user);
       window.alert('Usuari registrat correctament =)');
     } catch (error: any) {
       window.alert(error.error);
     }
-  }
-
-  mostrarDatos(): void {
-    console.log(this.user);
   }
 }

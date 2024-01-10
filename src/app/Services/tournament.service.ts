@@ -1,5 +1,4 @@
 import { HttpClient } from '@angular/common/http';
-import { NONE_TYPE } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { TournamentDTO } from '../Models/tournament.dto';
@@ -8,6 +7,7 @@ import { ParticipantDTO } from '../Models/participant.dto';
 import { ResultDTO } from '../Models/result.dto';
 import { GameDTO } from '../Models/game.dto.js';
 import { CommentDTO } from '../Models/comment.dto';
+import { environment } from '../../environments/environment';
 
 interface updateResponse {
   affected: number;
@@ -26,7 +26,7 @@ export class DbChessService {
 
   constructor(private http: HttpClient) {
     this.controller = '';
-    this.urlServerApi = 'http://localhost:3000/' + this.controller;
+    this.urlServerApi = (environment.apiUrl ?? window.origin) + '/';
   }
 
   getTournaments(): Promise<TournamentDTO[]> {
@@ -39,7 +39,7 @@ export class DbChessService {
   getTournamentsByUserId(userId: number): Promise<TournamentDTO[]> {
     return lastValueFrom(
       this.http.get<TournamentDTO[]>(
-        'http://localhost:3000/users/tournaments/' + userId
+        this.urlServerApi + 'users/tournaments/' + userId
       )
     );
   }
@@ -160,7 +160,7 @@ export class DbChessService {
       this.http.get<number>(this.urlServerApi + this.controller + tournamentId)
     );
   }
-  
+
   getUserLogin(user: UserDTO): Promise<any> {
     this.controller = 'users/auth';
     return lastValueFrom(

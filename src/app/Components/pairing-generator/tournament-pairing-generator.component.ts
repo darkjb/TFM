@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameDTO } from 'src/app/Models/game.dto.js';
-import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { PlayerDTO } from 'src/app/Models/player.dto';
 import { ResultDTO } from 'src/app/Models/result.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
-import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
@@ -61,29 +58,26 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     await this.getParticipants();
     await this.getResults();
 
-    let playersArray: number[] = [];
-    this.players.forEach((player) => {
-      playersArray.push(player.participantId);
-    });
+    let playersArray: number[] = this.players.map(
+      (player) => player.participantId
+    );
 
     this.bergerTable = this.generateBergerTable(playersArray);
 
+    let nextRound: number = 1;
     if (this.results.length > 0) {
       const pendingRound = this.lastRoundPending();
       if (pendingRound !== 0) {
         window.alert('La Ronda ' + pendingRound + ' no ha finalitzat');
       } else {
-        this.doNextPairing(
-          parseInt(this.results[this.results.length - 1].roundNumber) + 1
-        );
-        window.alert('Aparellament creat correctament =)');
-        //  this.goNextPairing(this.id);
+        nextRound =
+          parseInt(this.results[this.results.length - 1].roundNumber) + 1;
       }
-    } else {
-      this.doFirstPairing();
-      window.alert('Aparellament creat correctament =)');
-      this.goNextPairing(this.id);
     }
+
+    this.doNextPairing(nextRound);
+    window.alert('Aparellament creat correctament =)');
+    this.goNextPairing(this.id);
   }
 
   private async setTournamentStarted() {
@@ -125,20 +119,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
         this.sharedService.errorLog(error.error);
       }
     }
-  }
-  private async doFirstPairing(): Promise<void> {
-    //Funció que genera el primer aparellament
-    for (let i: number = 0; i < this.numPlayers / 2; i++) {
-      let pair: ResultDTO = new ResultDTO(this.id.toString(), '1', i + 1);
-      pair.player1 = this.players[i].participantId;
-      pair.player2 = this.players[this.players.length - i - 1].participantId;
-      this.pairing.push(pair);
-    }
-
-    await this.setTournamentStarted();
-    this.pairing.forEach(async (result) => {
-      await this.createResults(result);
-    });
   }
 
   private async doNextPairing(round: number): Promise<void> {
@@ -503,7 +483,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
       players[x - 1].push(players[x].pop()!);
       players[x].push(players[x - 1].shift()!);
       b = false;
-    } 
+    }
     return b;
   }
 

@@ -1,19 +1,22 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthDTO } from 'src/app/Models/auth.dto';
 import { HeaderMenus } from 'src/app/Models/header-menus.dto';
-import { UserDTO } from 'src/app/Models/user.dto';
 import { AuthService } from 'src/app/Services/auth.service';
 import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
-import { DbChessService } from 'src/app/Services/tournament.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
   loginUser: AuthDTO;
@@ -37,14 +40,11 @@ export class LoginComponent {
     this.responseOK = false;
     this.loginUser = new AuthDTO('', '', '', '');
 
-    this.mail = new FormControl('', [
-      Validators.required,
-      Validators.email,
-    ]);
+    this.mail = new FormControl('', [Validators.required, Validators.email]);
 
     this.password = new FormControl('', [
       Validators.required,
-      Validators.minLength(3),
+      Validators.minLength(4),
       Validators.maxLength(16),
     ]);
 
@@ -78,7 +78,7 @@ export class LoginComponent {
     if (this.password.hasError('minlength')) {
       message = 'El password ha de ser al menys de 4 caracters';
     }
-    
+
     if (this.password.hasError('maxlength')) {
       message = 'El password ha de ser com a molt de 16 caracters';
     }
@@ -98,12 +98,12 @@ export class LoginComponent {
       'loginFeedback',
       this.responseOK,
       this.errorResponse
-    )
+    );
 
-    if(this.responseOK) {
+    if (this.responseOK) {
       const headerInfo: HeaderMenus = {
         showAuthSection: true,
-        showNoAuthSection: false
+        showNoAuthSection: false,
       };
       // update options menu
       this.headerMenusService.headerManagement.next(headerInfo);
@@ -128,25 +128,8 @@ export class LoginComponent {
         showNoAuthSection: true,
       };
       this.headerMenusService.headerManagement.next(headerInfo);
-
+      window.alert('Convinació usuari/contrasenya incorrecta =S');
       this.sharedService.errorLog(error.error);
     }
   }
-
-  mostrarDatos(): void {
-    console.log(this.loginUser);
-  }
 }
-/*
-    try {
-      const login = await this.dbChessService.getUserLogin(this.user);
-      if (login.respuesta[0].true === 1) {
-        window.alert('Usuari logejat correctament =)');
-      } else {
-        window.alert('Convinació usuari/contrasenya incorrecta =S');
-      }
-    } catch (error: any) {
-      console.log(error.error);
-      window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
-    }
-  */

@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BlogDTO } from 'src/app/Models/blog.dto';
 import { CommentDTO } from 'src/app/Models/comment.dto';
-import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { UserDTO } from 'src/app/Models/user.dto';
-import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
@@ -16,43 +13,27 @@ import { DbChessService } from 'src/app/Services/tournament.service';
   styleUrls: ['./tournament-blog.component.scss'],
 })
 export class TournamentBlogComponent {
-  blog!: BlogDTO[];
   comments!: CommentDTO[];
   tournament!: TournamentDTO;
   owner: boolean;
   permission: boolean;
   permission2: boolean[] = [];
-  // showButtons: boolean;
   constructor(
     private dbChessService: DbChessService,
     private activatedRoute: ActivatedRoute,
     private localStorageService: LocalStorageService,
     private sharedService: SharedService,
-    private router: Router,
-    private headerMenusService: HeaderMenusService
+    private router: Router
   ) {
-    // this.showButtons = false;
     this.permission = false;
     this.owner = false;
     this.loadComments();
   }
 
-  ngOnInit(): void {
-    this.headerMenusService.headerManagement.subscribe(
-      (headerInfo: HeaderMenus) => {
-        if (headerInfo) {
-          // this.showButtons = headerInfo.showAuthSection;
-        }
-      }
-    );
-  }
+  ngOnInit(): void {}
 
   private async loadComments(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
-    const userId = this.localStorageService.get('user_id');
-    if (userId) {
-      //  this.showButtons = true;
-    }
     await this.getComments(identifier);
     await this.getTournament(identifier);
     await this.getNames();
@@ -92,8 +73,6 @@ export class TournamentBlogComponent {
   private async getNames(): Promise<void> {
     for (let i = 0; i < this.comments.length; i++) {
       this.comments[i].ownerName = await this.getName(this.comments[i].userId);
-      console.log(this.comments[i]);
-      //this.comments[i].date = this.getDate(this.comments[i].publication_date);
     }
   }
 
@@ -121,20 +100,6 @@ export class TournamentBlogComponent {
       }
     }
     return name;
-  }
-
-  private getDate(date: Date): string {
-    // Obtenir els components de la data
-    const dia = date.getDate();
-    const mes = date.getMonth() + 1; // S'afegeix 1 perquè els mesos comencen amb 0
-    const any = date.getFullYear();
-
-    // Format de la data: dd/mm/yyyy
-    const dataTransformada = `${dia.toString().padStart(2, '0')}/${mes
-      .toString()
-      .padStart(2, '0')}/${any}`;
-
-    return dataTransformada;
   }
 
   async doLike(commentId: number): Promise<void> {

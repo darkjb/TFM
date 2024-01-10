@@ -8,9 +8,8 @@ describe('TournamentPairingGeneratorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TournamentPairingGeneratorComponent ]
-    })
-    .compileComponents();
+      declarations: [TournamentPairingGeneratorComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TournamentPairingGeneratorComponent);
     component = fixture.componentInstance;

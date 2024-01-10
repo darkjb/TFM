@@ -7,7 +7,6 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommentDTO } from 'src/app/Models/comment.dto';
-import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
@@ -78,7 +77,6 @@ export class TournamentBlogCommentFormComponent {
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }
-    //console.log(this.tournament);
   }
 
   goBlogPage(): void {
@@ -91,9 +89,5 @@ export class TournamentBlogCommentFormComponent {
     this.router.navigateByUrl(
       '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
     );
-  }
-
-  mostrarDatos(): void {
-    console.log(this.comment);
   }
 }

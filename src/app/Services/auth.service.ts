@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthDTO } from '../Models/auth.dto';
 import { lastValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface AuthToken {
   user_id: string;
@@ -16,13 +17,11 @@ export class AuthService {
   private controller: string;
 
   constructor(private http: HttpClient) {
-    this.controller = 'users/auth';
-    this.urlServerApi = 'http://localhost:3000/' + this.controller;
+    this.controller = '/users/auth';
+    this.urlServerApi = environment.apiUrl ?? window.origin + this.controller;
   }
 
   login(auth: AuthDTO): Promise<AuthToken> {
-    return lastValueFrom(
-      this.http.post<AuthToken>(this.urlServerApi, auth)
-    );
+    return lastValueFrom(this.http.post<AuthToken>(this.urlServerApi, auth));
   }
 }

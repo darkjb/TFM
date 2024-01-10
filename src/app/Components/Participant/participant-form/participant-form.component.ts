@@ -1,16 +1,20 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormBuilder,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
 @Component({
   selector: 'app-participant-form',
   templateUrl: './participant-form.component.html',
-  styleUrls: ['./participant-form.component.scss']
+  styleUrls: ['./participant-form.component.scss'],
 })
 export class ParticipantFormComponent {
   participant: ParticipantDTO;
@@ -47,21 +51,23 @@ export class ParticipantFormComponent {
 
     this.elo = new FormControl(this.participant.elo, [
       Validators.required,
-      Validators.pattern("[0-9]+"),
+      Validators.pattern('[0-9]+'),
     ]);
 
     this.participantForm = this.formBuilder.group({
       name: this.name,
       surname: this.surname,
-      elo: this.elo
+      elo: this.elo,
     });
 
     this.id = parseInt(this.activatedRoute.snapshot.paramMap.get('id')!);
   }
 
-  private async getTournament(): Promise<void> {    
+  private async getTournament(): Promise<void> {
     try {
-      const list = await this.dbChessService.getTournamentById(this.activatedRoute.snapshot.paramMap.get('id')!);
+      const list = await this.dbChessService.getTournamentById(
+        this.activatedRoute.snapshot.paramMap.get('id')!
+      );
       this.tournament = list[0];
       this.started = this.tournament.started === 1;
     } catch (error: any) {
@@ -101,11 +107,11 @@ export class ParticipantFormComponent {
     let message = '';
 
     if (this.elo.hasError('required')) {
-      message = "El elo és obligatori. Si no en té, indica 0.";
+      message = 'El elo és obligatori. Si no en té, indica 0.';
     }
 
     if (this.elo.hasError('pattern')) {
-      message = "El elo ha de ser numèric";
+      message = 'El elo ha de ser numèric';
     }
 
     return message;
@@ -123,9 +129,8 @@ export class ParticipantFormComponent {
       loses: 0,
       white: 0,
       black: 0,
-      last: ''
+      last: '',
     };
-
 
     if (await this.dbChessService.createParticipant(this.participant)) {
       window.alert('Participant afegit correctament =)');
@@ -136,9 +141,5 @@ export class ParticipantFormComponent {
 
   goTournamentDetail(tournamentId: number): void {
     this.router.navigateByUrl('/tournament/' + tournamentId.toString());
-  }
-
-  mostrarDatos(): void {
-    console.log(this.participant);
   }
 }

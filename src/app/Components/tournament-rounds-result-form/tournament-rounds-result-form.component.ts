@@ -59,7 +59,6 @@ export class TournamentRoundsResultFormComponent {
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
-    console.log(this.results);
   }
 
   getBoardErrorMessage(): string {
@@ -168,7 +167,7 @@ export class TournamentRoundsResultFormComponent {
       );
     }
   }
-  
+
   private transformResult(): void {
     if (this.result.result == 'Guanyen Blanques') this.result.result = 'W';
     if (this.result.result == 'Guanyen Negres') this.result.result = 'B';
@@ -230,9 +229,5 @@ export class TournamentRoundsResultFormComponent {
     this.router.navigateByUrl(
       '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
     );
-  }
-
-  mostrarDatos(): void {
-    console.log(this.results);
   }
 }

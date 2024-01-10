@@ -12,7 +12,6 @@ import { TournamentFormComponent } from './Components/Tournament/tournament-form
 import { ParticipantListComponent } from './Components/Participant/participant-list/participant-list.component';
 import { ParticipantDetailComponent } from './Components/Participant/participant-detail/participant-detail.component';
 import { TournamentBlogComponent } from './Components//tournament-blog/tournament-blog.component';
-import { TournamentBlogEntryFormComponent } from './Components//tournament-blog-entry-form/tournament-blog-entry-form.component';
 import { TournamentBlogCommentFormComponent } from './Components//tournament-blog-comment-form/tournament-blog-comment-form.component';
 import { TournamentRankingComponent } from './Components/Tournament/tournament-ranking/tournament-ranking.component';
 import { TournamentRoundsListComponent } from './Components//tournament-rounds-list/tournament-rounds-list.component';
@@ -49,7 +48,6 @@ import { TournamentPairingNextComponent } from './Components/tournament-pairing-
     ParticipantListComponent,
     ParticipantDetailComponent,
     TournamentBlogComponent,
-    TournamentBlogEntryFormComponent,
     TournamentBlogCommentFormComponent,
     TournamentRankingComponent,
     TournamentRoundsListComponent,

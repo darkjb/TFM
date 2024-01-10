@@ -1,5 +1,3 @@
-import { BlogDTO } from "./blog.dto";
-
 export class TournamentDTO {
   tournamentId!: number;
   title: string;

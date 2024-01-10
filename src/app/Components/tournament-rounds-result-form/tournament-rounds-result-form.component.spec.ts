@@ -8,9 +8,8 @@ describe('TournamentRoundsResultFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TournamentRoundsResultFormComponent ]
-    })
-    .compileComponents();
+      declarations: [TournamentRoundsResultFormComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TournamentRoundsResultFormComponent);
     component = fixture.componentInstance;

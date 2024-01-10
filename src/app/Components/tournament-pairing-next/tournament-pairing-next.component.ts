@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HeaderMenus } from 'src/app/Models/header-menus.dto';
 import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { ResultDTO } from 'src/app/Models/result.dto';
-import { HeaderMenusService } from 'src/app/Services/header-menus.service';
-import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
 
@@ -30,28 +27,16 @@ export class TournamentPairingNextComponent {
   blackSurNames: String[] = [];
   id: number = 0;
   dataSource: any[] = [];
-  // showButtons: boolean;
   constructor(
     private dbChessService: DbChessService,
     private activatedRoute: ActivatedRoute,
-    private localStorageService: LocalStorageService,
     private sharedService: SharedService,
-    private router: Router,
-    private headerMenusService: HeaderMenusService
+    private router: Router
   ) {
-    // this.showButtons = false;
     this.loadData();
   }
 
-  ngOnInit(): void {
-    this.headerMenusService.headerManagement.subscribe(
-      (headerInfo: HeaderMenus) => {
-        if (headerInfo) {
-          // this.showButtons = headerInfo.showAuthSection;
-        }
-      }
-    );
-  }
+  ngOnInit(): void {}
 
   private async loadData(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
@@ -145,6 +130,5 @@ export class TournamentPairingNextComponent {
         surname2: this.blackSurNames[i],
       });
     }
-    console.log(this.dataSource);
   }
 }

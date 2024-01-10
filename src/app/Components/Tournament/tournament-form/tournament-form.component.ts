@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
@@ -8,7 +13,7 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 @Component({
   selector: 'app-tournament-form',
   templateUrl: './tournament-form.component.html',
-  styleUrls: ['./tournament-form.component.scss']
+  styleUrls: ['./tournament-form.component.scss'],
 })
 export class TournamentFormComponent {
   tournament: TournamentDTO;
@@ -19,12 +24,12 @@ export class TournamentFormComponent {
   tournamentForm: FormGroup;
   isValidForm: boolean | null;
   pairings: any[] = [
-    {name: "Sistema Suís", value: 1},
-    {name: "Round Robin", value: 2}
+    { name: 'Sistema Suís', value: 1 },
+    { name: 'Round Robin', value: 2 },
   ];
   tiebreakers: any[] = [
-    {name: "Buchholz", value: 1},
-    {name: "Sonneborn-Berger", value: 2}
+    { name: 'Buchholz', value: 1 },
+    { name: 'Sonneborn-Berger', value: 2 },
   ];
 
   constructor(
@@ -42,17 +47,17 @@ export class TournamentFormComponent {
     ]);
 
     this.pairing = new FormControl(this.tournament.pairing, [
-      Validators.required
+      Validators.required,
     ]);
 
     this.tiebreaker = new FormControl(this.tournament.tiebreaker, [
-      Validators.required
+      Validators.required,
     ]);
 
     this.tournamentForm = this.formBuilder.group({
       name: this.title,
       pairing: this.pairing,
-      tiebreaker: this.tiebreaker
+      tiebreaker: this.tiebreaker,
     });
   }
 
@@ -98,20 +103,17 @@ export class TournamentFormComponent {
       tiebreaker: this.tiebreaker.value.value,
       ownerId: 0,
       started: 0,
-      finished: 0
+      finished: 0,
     };
 
-    this.tournament.ownerId = parseInt(this.localStorageService.get('user_id')!);
+    this.tournament.ownerId = parseInt(
+      this.localStorageService.get('user_id')!
+    );
 
     if (await this.dbChessService.createTournament(this.tournament)) {
       window.alert('Torneig creat correctament =)');
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }
-    //console.log(this.tournament);
-  }
-
-  mostrarDatos(): void {
-    console.log(this.tournament);
   }
 }

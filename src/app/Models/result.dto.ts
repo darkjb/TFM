@@ -7,11 +7,7 @@ export class ResultDTO {
   player2: number;
   result: string;
 
-  constructor(
-    tournamentId: string,
-    roundNumber: string,
-    boardNumber: number,
-  ) {
+  constructor(tournamentId: string, roundNumber: string, boardNumber: number) {
     this.tournamentId = tournamentId;
     this.roundNumber = roundNumber;
     this.boardNumber = boardNumber;

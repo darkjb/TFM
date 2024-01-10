@@ -13,8 +13,8 @@
           comment.likes }} Likes</button>
         <button *ngIf="permission" mat-raised-button color="primary" (click)="doDislike(comment.commentId)">{{
           comment.dislikes }} DisLikes</button>
-          <button *ngIf="permission2[i] || owner" mat-raised-button color="primary"
-            (click)="deleteComment(comment.commentId)">Esborra</button>
+        <button *ngIf="permission2[i] || owner" mat-raised-button color="primary"
+          (click)="deleteComment(comment.commentId)">Esborra</button>
       </mat-card-actions>
       <mat-card-footer>Data de Publicació: {{ comment.publicationDate }}</mat-card-footer>
     </mat-card>

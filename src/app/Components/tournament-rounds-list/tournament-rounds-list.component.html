@@ -1,22 +1,22 @@
 <div class="container">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
-  <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let result of results">
-    <mat-card class="card animate__animated animate__bounce animate__fadeIn">
-      <mat-card-header>
-        <mat-card-title>Ronda número {{ result.roundNumber }}</mat-card-title>
-        <mat-card-subtitle *ngIf="result.roundEnded==0">Ronda en Curs</mat-card-subtitle>
-        <mat-card-subtitle *ngIf="result.roundEnded==1">Ronda Finalitzada</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <p>Torneig: {{ result.tournamentId }}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="goResultDetail(result.tournamentId, result.roundNumber)">
-          Detalls de la Ronda
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+    <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let result of results">
+      <mat-card class="card animate__animated animate__bounce animate__fadeIn">
+        <mat-card-header>
+          <mat-card-title>Ronda número {{ result.roundNumber }}</mat-card-title>
+          <mat-card-subtitle *ngIf="result.roundEnded==0">Ronda en Curs</mat-card-subtitle>
+          <mat-card-subtitle *ngIf="result.roundEnded==1">Ronda Finalitzada</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Torneig: {{ result.tournamentId }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-raised-button color="primary" (click)="goResultDetail(result.tournamentId, result.roundNumber)">
+            Detalls de la Ronda
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
 
   </div>
   <button mat-raised-button color="primary" (click)="goTournamentDetail(id)">

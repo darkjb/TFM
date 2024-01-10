@@ -11,7 +11,12 @@ export class ParticipantDTO {
   black: number;
   last: string;
 
-  constructor(tournamentId: number, name: string, surname: string, elo: number) {
+  constructor(
+    tournamentId: number,
+    name: string,
+    surname: string,
+    elo: number
+  ) {
     this.participantId = 0;
     this.tournamentId = tournamentId;
     this.name = name;

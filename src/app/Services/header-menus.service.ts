@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { HeaderMenus } from '../Models/header-menus.dto';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HeaderMenusService {
   headerManagement: BehaviorSubject<HeaderMenus> =

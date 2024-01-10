@@ -1,9 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ParticipantDTO } from 'src/app/Models/participant.dto';
 import { TournamentDTO } from 'src/app/Models/tournament.dto';
 import { UserDTO } from 'src/app/Models/user.dto';
-import { HeaderMenusService } from 'src/app/Services/header-menus.service';
 import { LocalStorageService } from 'src/app/Services/local-storage.service';
 import { SharedService } from 'src/app/Services/shared.service';
 import { DbChessService } from 'src/app/Services/tournament.service';
@@ -21,8 +19,7 @@ export class TournamentComponent {
     private activatedRoute: ActivatedRoute,
     private localStorageService: LocalStorageService,
     private sharedService: SharedService,
-    private router: Router,
-    private headerMenusService: HeaderMenusService
+    private router: Router
   ) {
     this.permission = false;
     this.loadTournament();
@@ -44,15 +41,17 @@ export class TournamentComponent {
     await this.getNames(this.tournament.ownerId);
   }
 
-  private async getNames(id: number): Promise <void> {
+  private async getNames(id: number): Promise<void> {
     this.tournament.ownerName = await this.getName(id);
     this.tournament.pairingName = this.getPairing(this.tournament.pairing);
-    this.tournament.tiebreakerName = this.getTiebreaker(this.tournament.tiebreaker);
+    this.tournament.tiebreakerName = this.getTiebreaker(
+      this.tournament.tiebreaker
+    );
     this.tournament.status = this.getStatus(this.tournament);
   }
 
-  private async getName(id: number): Promise<string>  {
-    let name = "";
+  private async getName(id: number): Promise<string> {
+    let name = '';
     if (id > 0) {
       try {
         const users: UserDTO[] = await this.dbChessService.getUserName(id);
@@ -71,7 +70,7 @@ export class TournamentComponent {
     if (p === 1) {
       pairing = 'Sistema Suís';
     } else if (p === 2) {
-      pairing = 'Round Robin'
+      pairing = 'Round Robin';
     }
     return pairing;
   }
@@ -81,7 +80,7 @@ export class TournamentComponent {
     if (t === 1) {
       tiebreaker = 'Buchholz';
     } else if (t === 2) {
-      tiebreaker = 'Sonneborn-Berger'
+      tiebreaker = 'Sonneborn-Berger';
     }
     return tiebreaker;
   }

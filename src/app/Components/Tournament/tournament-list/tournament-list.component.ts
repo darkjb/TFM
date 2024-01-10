@@ -15,7 +15,7 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 })
 export class TournamentListComponent {
   tournaments!: TournamentDTO[];
- // showButtons: boolean;
+  // showButtons: boolean;
   constructor(
     private dbChessService: DbChessService,
     private localStorageService: LocalStorageService,
@@ -23,7 +23,7 @@ export class TournamentListComponent {
     private router: Router,
     private headerMenusService: HeaderMenusService
   ) {
-   // this.showButtons = false;
+    // this.showButtons = false;
     this.loadTournaments();
   }
 
@@ -31,7 +31,7 @@ export class TournamentListComponent {
     this.headerMenusService.headerManagement.subscribe(
       (headerInfo: HeaderMenus) => {
         if (headerInfo) {
-         // this.showButtons = headerInfo.showAuthSection;
+          // this.showButtons = headerInfo.showAuthSection;
         }
       }
     );
@@ -40,7 +40,7 @@ export class TournamentListComponent {
   private async loadTournaments(): Promise<void> {
     const userId = this.localStorageService.get('user_id');
     if (userId) {
-    //  this.showButtons = true;
+      //  this.showButtons = true;
     }
     await this.getTournaments();
     await this.getNames();
@@ -52,21 +52,25 @@ export class TournamentListComponent {
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
-
-    //setTimeout(() => {  console.log("World!"); }, 5000);
   }
 
   private async getNames(): Promise<void> {
-    for(let i = 0; i < this.tournaments.length; i++) {
-      this.tournaments[i].ownerName = await this.getName(this.tournaments[i].ownerId);
-      this.tournaments[i].pairingName = this.getPairing(this.tournaments[i].pairing);
-      this.tournaments[i].tiebreakerName = this.getTiebreaker(this.tournaments[i].tiebreaker);
+    for (let i = 0; i < this.tournaments.length; i++) {
+      this.tournaments[i].ownerName = await this.getName(
+        this.tournaments[i].ownerId
+      );
+      this.tournaments[i].pairingName = this.getPairing(
+        this.tournaments[i].pairing
+      );
+      this.tournaments[i].tiebreakerName = this.getTiebreaker(
+        this.tournaments[i].tiebreaker
+      );
       this.tournaments[i].status = this.getStatus(this.tournaments[i]);
     }
   }
 
-  private async getName(id: number): Promise<string>  {
-    let name = "";
+  private async getName(id: number): Promise<string> {
+    let name = '';
     if (id > 0) {
       try {
         const users: UserDTO[] = await this.dbChessService.getUserName(id);
@@ -85,7 +89,7 @@ export class TournamentListComponent {
     if (p === 1) {
       pairing = 'Sistema Suís';
     } else if (p === 2) {
-      pairing = 'Round Robin'
+      pairing = 'Round Robin';
     }
     return pairing;
   }
@@ -95,7 +99,7 @@ export class TournamentListComponent {
     if (t === 1) {
       tiebreaker = 'Buchholz';
     } else if (t === 2) {
-      tiebreaker = 'Sonneborn-Berger'
+      tiebreaker = 'Sonneborn-Berger';
     }
     return tiebreaker;
   }

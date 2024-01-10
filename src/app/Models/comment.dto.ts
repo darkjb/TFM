@@ -11,6 +11,6 @@ export class CommentDTO {
   constructor() {
     this.likes = 0;
     this.dislikes = 0;
-    this.text = "";
+    this.text = '';
   }
 }

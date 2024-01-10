@@ -1,4 +1,3 @@
-
 <div class="table">
   <table mat-table [dataSource]="participants" class="mat-elevation-z8">
     <!-- Position Column -->
@@ -23,7 +22,7 @@
     </ng-container>
     <!-- Points Column -->
     <ng-container matColumnDef="points">
-      <th mat-header-cell *matHeaderCellDef> Puntuació  </th>
+      <th mat-header-cell *matHeaderCellDef> Puntuació </th>
       <td mat-cell *matCellDef="let participant"> {{participant.wins + (participant.ties / 2)}} </td>
     </ng-container>
 
