@@ -94,10 +94,6 @@ export class TournamentRoundsResultFormComponent {
 
     this.transformResult();
 
-    console.log(this.result.tournamentId);
-    console.log(this.result.roundNumber);
-    console.log(this.result.boardNumber);
-
     const res = await this.dbChessService.getResult(
       this.result.tournamentId,
       this.result.roundNumber,
@@ -107,7 +103,6 @@ export class TournamentRoundsResultFormComponent {
     if (res[0].result == '') {
       try {
         await this.dbChessService.updateResult(this.result);
-        console.log(this.result);
         this.result = (
           await this.dbChessService.getResult(
             this.result.tournamentId,
@@ -115,7 +110,6 @@ export class TournamentRoundsResultFormComponent {
             this.result.boardNumber
           )
         )[0];
-        console.log(this.result);
         let player1: ParticipantDTO[] =
           await this.dbChessService.getParicipantById(
             this.result.tournamentId,
@@ -187,11 +181,11 @@ export class TournamentRoundsResultFormComponent {
       } catch (error: any) {
         this.sharedService.errorLog(error.error);
       }
-      await this.checkTournamentEnd();
+      await this.checkTournamentEnd(parseInt(this.result.roundNumber));
     }
   }
 
-  private async checkTournamentEnd(): Promise<void> {
+  private async checkTournamentEnd(round: number): Promise<void> {
     const tournament: TournamentDTO = (
       await this.dbChessService.getTournamentById(this.result.tournamentId)
     )[0];
@@ -208,8 +202,11 @@ export class TournamentRoundsResultFormComponent {
         finalRound = n;
       }
     }
-    await this.endTournament(finalRound, tournament);
-    window.alert('El Torneig ha Finalitzat!');
+
+    if (round === finalRound) {
+      await this.endTournament(finalRound, tournament);
+      window.alert('El Torneig ha Finalitzat!');
+    }
   }
 
   private async endTournament(

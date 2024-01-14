@@ -72,12 +72,16 @@ export class TournamentPairingGeneratorComponent implements OnInit {
       } else {
         nextRound =
           parseInt(this.results[this.results.length - 1].roundNumber) + 1;
+        await this.doNextPairing(nextRound);
+        window.alert('Aparellament creat correctament =)');
+        this.goNextPairing(this.id);
       }
+    } else {
+      await this.doNextPairing(nextRound);
+      window.alert('Aparellament creat correctament =)');
+      await this.setTournamentStarted();
+      this.goNextPairing(this.id);
     }
-
-    this.doNextPairing(nextRound);
-    window.alert('Aparellament creat correctament =)');
-    this.goNextPairing(this.id);
   }
 
   private async setTournamentStarted() {
@@ -161,17 +165,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     //Grabem l'aparellament com a resultat buit
     try {
       await this.dbChessService.createResult(result);
-      console.log('Aparellament creat correctament =)');
-      console.log(
-        'Ronda ' +
-          result.roundNumber +
-          ', tauler ' +
-          result.boardNumber +
-          ': ' +
-          result.player1 +
-          ' vs ' +
-          result.player2
-      );
     } catch (error: any) {
       window.alert(error.error);
     }
@@ -251,8 +244,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     this.divideByColor(playerGroups, wPlayers, bPlayers);
 
     let board: number = 1;
-    console.log(wPlayers);
-    console.log(bPlayers);
 
     for (let i = wPlayers.length - 1; i >= 0; i--) {
       for (let j = 0; j < wPlayers[i].length; j++) {
@@ -277,8 +268,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
         board++;
       }
     }
-    console.log(this.players);
-    console.log(this.pairing);
   }
 
   private fillPlayerData(array: PlayerDTO[]): void {
@@ -371,7 +360,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
 
     for (let i: number = nGroups - 1; i >= 0; i--) {
       groups[i] = players.filter((player) => 2 * player.puntuacio === i);
-      console.log(groups[i]);
     }
 
     return groups;
@@ -436,11 +424,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
     let end: boolean = false; // Variable per controlar que no mirem indefinidament aparellaments al últim grup de puntuació
     let n: number = 1;
     while (this.checkPair(wPlayers[i][j].id, bPlayers[i][j].id) || end) {
-      console.log('grup ' + i + ', jugadors ' + j + ': iteració ' + n);
       // Si aquest aparellament ja s'ha jugat, movem els jugadors
-      console.log(
-        wPlayers[i][j].id + ' ja ha jugat contra ' + bPlayers[i][j].id
-      );
       if (j === wPlayers[i].length - 1) {
         // Estem intentant aparellar l'últim jugador del grup, mirem si podem canviar amb un jugador del següent grup
         end = this.changeGroup(bPlayers, i);
@@ -497,8 +481,6 @@ export class TournamentPairingGeneratorComponent implements OnInit {
       const temp = players[pos];
       players[pos] = players[pos + jump];
       players[pos + jump] = temp;
-    } else {
-      console.log('últim jugador del array');
     }
   }
 

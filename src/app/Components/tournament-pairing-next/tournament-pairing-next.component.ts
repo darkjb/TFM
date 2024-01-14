@@ -43,8 +43,6 @@ export class TournamentPairingNextComponent {
     this.id = parseInt(identifier);
     await this.getParticipants(identifier);
     await this.getNexPairing(identifier);
-    console.log(this.participants);
-    console.log(this.pairing);
 
     this.showPairing();
     this.fillDataSource();
@@ -71,7 +69,6 @@ export class TournamentPairingNextComponent {
   }
 
   private showPairing(): void {
-    console.log(this.pairing);
     for (let i: number = 0; i < this.pairing.length; i++) {
       let name1: string = 'BYE';
       let name2: string = 'BYE';

@@ -90,7 +90,6 @@ export class DbChessService {
 
   updateResult(result: ResultDTO): Promise<ResultDTO> {
     this.controller = 'reserved/result';
-    console.log(this.urlServerApi + this.controller);
     return lastValueFrom(
       this.http.put<ResultDTO>(this.urlServerApi + this.controller, result)
     );
@@ -199,7 +198,6 @@ export class DbChessService {
 
   updateParticipant(participant: ParticipantDTO): Promise<ParticipantDTO> {
     this.controller = 'reserved/participant';
-    console.log(this.urlServerApi + this.controller);
     return lastValueFrom(
       this.http.put<ParticipantDTO>(
         this.urlServerApi + this.controller,
@@ -244,7 +242,6 @@ export class DbChessService {
 
   updateTournament(tournament: TournamentDTO): Promise<TournamentDTO> {
     this.controller = 'reserved/tournament';
-    console.log(this.urlServerApi + this.controller);
     return lastValueFrom(
       this.http.put<TournamentDTO>(
         this.urlServerApi + this.controller,

@@ -38,7 +38,6 @@ export class TournamentBlogComponent {
     await this.getTournament(identifier);
     await this.getNames();
     await this.getPermissions();
-    console.log(this.comments);
   }
 
   private async getComments(tournamentId: string): Promise<void> {
@@ -50,7 +49,6 @@ export class TournamentBlogComponent {
     if (this.localStorageService.get('user_id')) {
       this.permission = true;
     }
-    console.log(this.comments);
   }
 
   private async getTournament(tournamentId: string): Promise<void> {

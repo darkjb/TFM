@@ -128,7 +128,7 @@ export class LoginComponent {
         showNoAuthSection: true,
       };
       this.headerMenusService.headerManagement.next(headerInfo);
-      window.alert('Convinació usuari/contrasenya incorrecta =S');
+      window.alert('Combinació usuari/contrasenya incorrecta =S');
       this.sharedService.errorLog(error.error);
     }
   }
