@@ -18,7 +18,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.controller = '/users/auth';
-    this.urlServerApi = (environment.apiUrl ?? window.origin) + this.controller;
+    this.urlServerApi = (environment.apiBaseUrl ?? window.origin) + environment.apiPrefix + this.controller;
   }
 
   login(auth: AuthDTO): Promise<AuthToken> {

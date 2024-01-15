@@ -1,7 +1,7 @@
 <div class="container">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
     <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let result of results">
-      <mat-card class="card animate__animated animate__bounce animate__fadeIn">
+      <mat-card class="card animate__animated animate__bounce animate__fadeIn" tabindex="0">
         <mat-card-header>
           <mat-card-title>Ronda número {{ result.roundNumber }}</mat-card-title>
           <mat-card-subtitle *ngIf="result.roundEnded==0">Ronda en Curs</mat-card-subtitle>

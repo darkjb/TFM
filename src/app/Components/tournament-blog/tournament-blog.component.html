@@ -1,6 +1,6 @@
 <div class="container">
   <div *ngFor="let comment of comments; let i = index">
-    <mat-card class="card animate__animated animate__bounce animate__fadeIn">
+    <mat-card class="card animate__animated animate__bounce animate__fadeIn" tabindex="0">
       <mat-card-header>
         <mat-card-title>Entrada {{ i+1 }}</mat-card-title>
         <mat-card-subtitle>Autor: {{ comment.ownerName }}</mat-card-subtitle>

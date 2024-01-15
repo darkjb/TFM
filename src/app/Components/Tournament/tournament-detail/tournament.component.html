@@ -9,7 +9,7 @@
     <p>Creat per: {{ tournament.ownerName }}</p>
     <p>Aparellament: {{ tournament.pairingName }}</p>
     <p>Desempat: {{ tournament.tiebreakerName }}</p>
-    <mat-list>
+    <mat-list role="navigation">
       <mat-list-item><button mat-button color="primary" (click)="goBlogPage(tournament.tournamentId)">Blog del
           Torneig</button></mat-list-item>
       <mat-list-item><button mat-button color="primary"

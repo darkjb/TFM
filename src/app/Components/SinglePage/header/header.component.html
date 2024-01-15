@@ -1,7 +1,7 @@
 <header>
   <img class="logo" src="../../../../assets/Logo.jpg" />
 
-  <div *ngIf="showNoAuthSection">
+  <div *ngIf="showNoAuthSection" role="navigation">
     <button mat-button color="primary" (click)="goHome()">Inici</button>
     <button mat-button color="primary" (click)="goLogin()">Login</button>
     <button mat-button color="primary" (click)="goRegister()">Registre</button>
@@ -9,7 +9,7 @@
     <button mat-button color="primary" (click)="goFaqs()">FAQS</button>
   </div>
 
-  <div *ngIf="showAuthSection">
+  <div *ngIf="showAuthSection" role="navigation">
     <button mat-button color="primary" (click)="goHome()">Inici</button>
     <button mat-button color="primary" (click)="goNewTournament()">Crear Torneig</button>
     <button mat-button color="primary" (click)="goTournamentList()">Tornejos</button>

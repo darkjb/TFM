@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FlexLayoutModule } from '@angular/flex-layout';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RegisterComponent } from './Components/SinglePage/register/register.component';
@@ -59,7 +58,7 @@ import { TournamentPairingNextComponent } from './Components/tournament-pairing-
     FaqsComponent,
     ParticipantFormComponent,
     TournamentPairingGeneratorComponent,
-    TournamentPairingNextComponent
+    TournamentPairingNextComponent,
   ],
   imports: [
     BrowserModule,
@@ -75,7 +74,7 @@ import { TournamentPairingNextComponent } from './Components/tournament-pairing-
     MatListModule,
     MatGridListModule,
     MatSelectModule,
-    MatTableModule
+    MatTableModule,
   ],
   providers: [
     {
@@ -84,6 +83,6 @@ import { TournamentPairingNextComponent } from './Components/tournament-pairing-
       multi: true,
     },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

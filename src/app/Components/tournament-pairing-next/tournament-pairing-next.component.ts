@@ -27,6 +27,7 @@ export class TournamentPairingNextComponent {
   blackSurNames: String[] = [];
   id: number = 0;
   dataSource: any[] = [];
+  started: boolean = false;
   constructor(
     private dbChessService: DbChessService,
     private activatedRoute: ActivatedRoute,
@@ -44,8 +45,13 @@ export class TournamentPairingNextComponent {
     await this.getParticipants(identifier);
     await this.getNexPairing(identifier);
 
-    this.showPairing();
-    this.fillDataSource();
+    if(this.pairing.length > 0) {
+      this.showPairing();
+      this.fillDataSource();
+      this.started = true;
+    } else {
+      this.started = false;
+    }
   }
 
   private async getParticipants(tournamentId: string): Promise<void> {

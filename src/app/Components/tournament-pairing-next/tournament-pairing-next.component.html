@@ -1,39 +1,47 @@
-<div class="table" *ngIf="dataSource.length > 0">
-  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-    <!-- BoardNumber Column -->
-    <ng-container matColumnDef="boardNumber">
-      <th mat-header-cell *matHeaderCellDef> Tauler </th>
-      <td mat-cell *matCellDef="let board"> {{board.boardNumber}} </td>
-    </ng-container>
-    <!-- White Player Name Column -->
-    <ng-container matColumnDef="name1">
-      <th mat-header-cell *matHeaderCellDef> Nom Jugador/a/e amb Blanques </th>
-      <td mat-cell *matCellDef="let board"> {{board.name1}} </td>
-    </ng-container>
-    <!-- White Player Surname Column -->
-    <ng-container matColumnDef="surname1">
-      <th mat-header-cell *matHeaderCellDef> Cognom Jugador/a/e amb Blanques </th>
-      <td mat-cell *matCellDef="let board"> {{board.surname1}} </td>
-    </ng-container>
-    <!-- Versus Column -->
-    <ng-container matColumnDef="vs">
-      <th mat-header-cell *matHeaderCellDef> VS </th>
-      <td mat-cell *matCellDef="let board"> VS </td>
-    </ng-container>
-    <!-- Black Player Name Column -->
-    <ng-container matColumnDef="name2">
-      <th mat-header-cell *matHeaderCellDef> Nom Jugador/a/e amb Negres </th>
-      <td mat-cell *matCellDef="let board"> {{board.name2}} </td>
-    </ng-container>
-    <!-- Black Player Surname Column -->
-    <ng-container matColumnDef="surname2">
-      <th mat-header-cell *matHeaderCellDef> Cognom Jugador/a/e amb Negres </th>
-      <td mat-cell *matCellDef="let board"> {{board.surname2}} </td>
-    </ng-container>
+<h2 *ngIf="!started">El torneig ja ha finalitzat, no es poden realitzar més aparellaments.</h2>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+<div *ngIf="started">
 
+  <div class="table" *ngIf="dataSource.length > 0">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8"
+      aria-label="Taula d'aparellaments de la propera ronda">
+      <!-- BoardNumber Column -->
+      <ng-container matColumnDef="boardNumber">
+        <th mat-header-cell *matHeaderCellDef> Tauler </th>
+        <td mat-cell *matCellDef="let board"> {{board.boardNumber}} </td>
+      </ng-container>
+      <!-- White Player Name Column -->
+      <ng-container matColumnDef="name1">
+        <th mat-header-cell *matHeaderCellDef> Nom Jugador/a/e amb Blanques </th>
+        <td mat-cell *matCellDef="let board"> {{board.name1}} </td>
+      </ng-container>
+      <!-- White Player Surname Column -->
+      <ng-container matColumnDef="surname1">
+        <th mat-header-cell *matHeaderCellDef> Cognom Jugador/a/e amb Blanques </th>
+        <td mat-cell *matCellDef="let board"> {{board.surname1}} </td>
+      </ng-container>
+      <!-- Versus Column -->
+      <ng-container matColumnDef="vs">
+        <th mat-header-cell *matHeaderCellDef> VS </th>
+        <td mat-cell *matCellDef="let board"> VS </td>
+      </ng-container>
+      <!-- Black Player Name Column -->
+      <ng-container matColumnDef="name2">
+        <th mat-header-cell *matHeaderCellDef> Nom Jugador/a/e amb Negres </th>
+        <td mat-cell *matCellDef="let board"> {{board.name2}} </td>
+      </ng-container>
+      <!-- Black Player Surname Column -->
+      <ng-container matColumnDef="surname2">
+        <th mat-header-cell *matHeaderCellDef> Cognom Jugador/a/e amb Negres </th>
+        <td mat-cell *matCellDef="let board"> {{board.surname2}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>
+
+<div>
   <button mat-raised-button color="primary" (click)="goTournamentDetail(id)">Detalls del Torneig</button>
 </div>

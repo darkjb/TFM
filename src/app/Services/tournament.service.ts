@@ -26,7 +26,7 @@ export class DbChessService {
 
   constructor(private http: HttpClient) {
     this.controller = '';
-    this.urlServerApi = (environment.apiUrl ?? window.origin) + '/';
+    this.urlServerApi = (environment.apiBaseUrl ?? window.origin) + environment.apiPrefix + '/';
   }
 
   getTournaments(): Promise<TournamentDTO[]> {
