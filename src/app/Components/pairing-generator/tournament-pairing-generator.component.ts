@@ -21,7 +21,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   newTournament!: boolean;
   numPlayers!: number;
   haveBye!: boolean;
-  finished: boolean = true;
+  finished: boolean;
   tournamentStarted: boolean;
   bergerTable: number[][] = [];
 
@@ -33,6 +33,7 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   ) {
     this.getId();
     this.tournamentStarted = false;
+    this.finished = false;
   }
 
   async ngOnInit(): Promise<void> {
