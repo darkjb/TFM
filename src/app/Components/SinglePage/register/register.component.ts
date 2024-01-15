@@ -26,7 +26,8 @@ export class RegisterComponent {
 
   constructor(
     private formBuilder: FormBuilder,
-    private dbChessService: DbChessService
+    private dbChessService: DbChessService,
+    private router: Router
   ) {
     this.isValidForm = null;
     this.user = new UserDTO('', '', '', '');
@@ -132,8 +133,13 @@ export class RegisterComponent {
     try {
       await this.dbChessService.createUser(this.user);
       window.alert('Usuari registrat correctament =)');
+      this.goLogin();
     } catch (error: any) {
       window.alert(error.error);
     }
+  }
+
+  goLogin(): void {
+    this.router.navigateByUrl('login');
   }
 }

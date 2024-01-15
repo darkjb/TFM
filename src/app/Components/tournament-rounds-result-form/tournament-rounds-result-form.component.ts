@@ -19,8 +19,10 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 })
 export class TournamentRoundsResultFormComponent {
   result: ResultDTO;
+  tournament!: TournamentDTO;
   results!: ResultDTO[];
   finished: boolean = false;
+  started: boolean = false;
   board: FormControl;
   score: FormControl;
   boardNumbers: number[] = [];
@@ -36,7 +38,6 @@ export class TournamentRoundsResultFormComponent {
     private activatedRoute: ActivatedRoute,
     private router: Router
   ) {
-    this.getResults();
     this.isValidForm = null;
     this.result = new ResultDTO('', '', 0);
 
@@ -50,12 +51,31 @@ export class TournamentRoundsResultFormComponent {
     });
   }
 
+  async ngOnInit(): Promise<void> {
+    await this.getResults();
+    await this.getTournament();
+    this.started = this.tournament.started === 1;
+    this.finished = this.tournament.finished === 1;
+  }
+
   private async getResults(): Promise<void> {
     try {
       this.results = await this.dbChessService.getLastResults(
         this.activatedRoute.snapshot.paramMap.get('id')!
       );
       this.results.forEach((res) => this.boardNumbers.push(res.boardNumber));
+    } catch (error: any) {
+      this.sharedService.errorLog(error.error);
+    }
+  }
+
+  private async getTournament(): Promise<void> {
+    try {
+      this.tournament = (
+        await this.dbChessService.getTournamentById(
+          this.activatedRoute.snapshot.paramMap.get('id')!
+        )
+      )[0];
     } catch (error: any) {
       this.sharedService.errorLog(error.error);
     }
@@ -131,6 +151,8 @@ export class TournamentRoundsResultFormComponent {
     } else {
       this.showAlert(res[0].result);
     }
+
+    this.resultForm.reset();
   }
 
   private countResult(p1: ParticipantDTO, p2: ParticipantDTO): void {
@@ -206,6 +228,7 @@ export class TournamentRoundsResultFormComponent {
     if (round === finalRound) {
       await this.endTournament(finalRound, tournament);
       window.alert('El Torneig ha Finalitzat!');
+      this.goClassification(this.tournament.tournamentId);
     }
   }
 
@@ -225,6 +248,12 @@ export class TournamentRoundsResultFormComponent {
   goTournamentDetail(): void {
     this.router.navigateByUrl(
       '/tournament/' + this.activatedRoute.snapshot.paramMap.get('id')!
+    );
+  }
+
+  goClassification(tournamentId: number): void {
+    this.router.navigateByUrl(
+      '/tournament/classification/' + tournamentId.toString()
     );
   }
 }

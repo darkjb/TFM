@@ -27,10 +27,11 @@ export class TournamentBlogComponent {
   ) {
     this.permission = false;
     this.owner = false;
-    this.loadComments();
   }
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadComments();
+  }
 
   private async loadComments(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;

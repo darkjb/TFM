@@ -134,6 +134,7 @@ export class ParticipantFormComponent {
 
     if (await this.dbChessService.createParticipant(this.participant)) {
       window.alert('Participant afegit correctament =)');
+      this.participantForm.reset();
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }

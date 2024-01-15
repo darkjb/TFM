@@ -33,11 +33,11 @@ export class TournamentPairingNextComponent {
     private activatedRoute: ActivatedRoute,
     private sharedService: SharedService,
     private router: Router
-  ) {
-    this.loadData();
-  }
+  ) {}
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadData();
+  }
 
   private async loadData(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;
@@ -45,7 +45,7 @@ export class TournamentPairingNextComponent {
     await this.getParticipants(identifier);
     await this.getNexPairing(identifier);
 
-    if(this.pairing.length > 0) {
+    if (this.pairing.length > 0) {
       this.showPairing();
       this.fillDataSource();
       this.started = true;

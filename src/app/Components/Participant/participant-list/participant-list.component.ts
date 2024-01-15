@@ -18,11 +18,11 @@ export class ParticipantListComponent {
     private activatedRoute: ActivatedRoute,
     private sharedService: SharedService,
     private router: Router
-  ) {
-    this.loadParticipants();
-  }
+  ) {}
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadParticipants();
+  }
 
   private async loadParticipants(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;

@@ -1,4 +1,6 @@
-<div class="container">
+<div *ngIf="!started">El torneig encara no ha començat!</div>
+
+<div *ngIf="started" class="container">
   <div fxLayout="row wrap" fxLayoutGap="16px grid">
     <div fxFlex="25%" fxFlex.xs="100%" fxFlex.sm="33%" *ngFor="let result of results">
       <mat-card class="card animate__animated animate__bounce animate__fadeIn" tabindex="0">

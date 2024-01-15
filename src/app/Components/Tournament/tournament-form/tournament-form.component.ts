@@ -110,10 +110,17 @@ export class TournamentFormComponent {
       this.localStorageService.get('user_id')!
     );
 
-    if (await this.dbChessService.createTournament(this.tournament)) {
+    const newTournament: TournamentDTO = await this.dbChessService.createTournament(this.tournament);
+
+    if (newTournament) {
       window.alert('Torneig creat correctament =)');
+      this.goTournamentDetail(newTournament.tournamentId);
     } else {
       window.alert('Ha fallat alguna cosa, torna a intentar-ho més tard =(');
     }
+  }
+  
+  goTournamentDetail(tournamentId: number): void {
+    this.router.navigateByUrl('/tournament/' + tournamentId.toString());
   }
 }

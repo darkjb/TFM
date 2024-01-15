@@ -2,7 +2,9 @@
 
 <h2 *ngIf="finished">El torneig ja ha acabat, no es poden afegir més resultats.</h2>
 
-<form *ngIf="!finished" [formGroup]="resultForm" (ngSubmit)="sendForm()">
+<h2 *ngIf="!started">El torneig encara no ha començat, no es poden afegir resultats.</h2>
+
+<form *ngIf="(!finished)&&(started)" [formGroup]="resultForm" (ngSubmit)="sendForm()">
   <section>
     <mat-form-field appearance="fill">
       <mat-label>Taulell: </mat-label>

@@ -25,11 +25,11 @@ export class TournamentRoundsDetailComponent {
     private activatedRoute: ActivatedRoute,
     private sharedService: SharedService,
     private router: Router
-  ) {
-    this.loadData();
-  }
+  ) {}
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadData();
+  }
 
   private async loadData(): Promise<void> {
     const identifier1 = this.activatedRoute.snapshot.paramMap.get('id1')!;

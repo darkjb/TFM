@@ -11,6 +11,7 @@ import { DbChessService } from 'src/app/Services/tournament.service';
 })
 export class TournamentRoundsListComponent {
   results!: ResultDTO[];
+  started: boolean = false;
   id: number = 0;
   constructor(
     private dbChessService: DbChessService,
@@ -18,10 +19,12 @@ export class TournamentRoundsListComponent {
     private sharedService: SharedService,
     private router: Router
   ) {
-    this.loadResults();
   }
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    await this.loadResults();
+    this.started = this.results.length > 0;
+  }
 
   private async loadResults(): Promise<void> {
     const identifier = this.activatedRoute.snapshot.paramMap.get('id')!;

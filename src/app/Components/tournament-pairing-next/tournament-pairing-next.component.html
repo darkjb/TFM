@@ -1,7 +1,6 @@
 <h2 *ngIf="!started">El torneig ja ha finalitzat, no es poden realitzar més aparellaments.</h2>
 
 <div *ngIf="started">
-
   <div class="table" *ngIf="dataSource.length > 0">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8"
       aria-label="Taula d'aparellaments de la propera ronda">

@@ -56,6 +56,14 @@ export class TournamentPairingGeneratorComponent implements OnInit {
   async doPairing(): Promise<void> {
     //Recuperem dades i generem l'aparellament
     await this.getParticipants();
+    if (this.numPlayers === 2 && this.haveBye) {
+      window.alert(`No es pot fer un aparellament d'un sol jugador!`)
+    } else {
+      this.continuePairing();
+    }
+  }
+
+  async continuePairing(): Promise<void> {
     await this.getResults();
 
     let playersArray: number[] = this.players.map(
